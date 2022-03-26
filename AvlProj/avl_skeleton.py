@@ -29,7 +29,7 @@ class AVLNode(object):
     """
 
     def getLeft(self):
-        return None  # todo: after forum answer
+        return self.left
 
     """returns the right child
 
@@ -38,7 +38,7 @@ class AVLNode(object):
     """
 
     def getRight(self):
-        return None  # todo: after forum answer
+        return self.right
 
 	"""returns the parent 
 
