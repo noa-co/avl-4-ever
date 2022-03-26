@@ -11,104 +11,125 @@
 class AVLNode(object):
 	"""Constructor, you are allowed to add more fields. 
 
-	@type value: str
-	@param value: data of your node
-	"""
-	def __init__(self, value):
-		self.value = value
-		self.left = None
-		self.right = None
-		self.parent = None
-		self.height = -1
-		self.size = 1
+    @type value: str
+    @param value: data of your node
+    """
 
-	"""returns the left child
-	@rtype: AVLNode
-	@returns: the left child of self, None if there is no left child
-	"""
-	def getLeft(self):
-		return None
+    def __init__(self, value):
+        self.value = value
+        self.left = fakeNode
+        self.right = fakeNode
+        self.parent = None
+        self.height = -1
+        self.size = 1
 
+    """returns the left child
+    @rtype: AVLNode
+    @returns: the left child of self, None if there is no left child
+    """
 
-	"""returns the right child
+    def getLeft(self):
+        return None  # todo: after forum answer
 
-	@rtype: AVLNode
-	@returns: the right child of self, None if there is no right child
-	"""
-	def getRight(self):
-		return None
+    """returns the right child
+
+    @rtype: AVLNode
+    @returns: the right child of self, None if there is no right child
+    """
+
+    def getRight(self):
+        return None  # todo: after forum answer
 
 	"""returns the parent 
 
+    @rtype: AVLNode
+    @returns: the parent of self, None if there is no parent
+    """
+
+    def getParent(self):
+        return self.parent
+
+	"""returns the size 
+
 	@rtype: AVLNode
-	@returns: the parent of self, None if there is no parent
+	@returns: the size of self, 0 if the node is virtual
 	"""
-	def getParent(self):
-		return None
+    def getSize(self):
+		if self.isRealNode():
+			return 0
+		return self.size
+
 
 	"""return the value
 
-	@rtype: str
-	@returns: the value of self, None if the node is virtual
-	"""
-	def getValue(self):
-		return None
+    @rtype: str
+    @returns: the value of self, None if the node is virtual
+    """
+
+    def getValue(self):
+        return self.value
 
 	"""returns the height
 
-	@rtype: int
-	@returns: the height of self, -1 if the node is virtual
-	"""
-	def getHeight(self):
-		return -1
+    @rtype: int
+    @returns: the height of self, -1 if the node is virtual
+    """
+
+    def getHeight(self):
+        return self.height
 
 	"""sets left child
 
-	@type node: AVLNode
-	@param node: a node
-	"""
-	def setLeft(self, node):
-		return None
+    @type node: AVLNode
+    @param node: a node
+    """
+
+    def setLeft(self, node):
+        self.left = node
 
 	"""sets right child
 
-	@type node: AVLNode
-	@param node: a node
-	"""
-	def setRight(self, node):
-		return None
+    @type node: AVLNode
+    @param node: a node
+    """
+
+    def setRight(self, node):
+        self.right = node
 
 	"""sets parent
 
-	@type node: AVLNode
-	@param node: a node
-	"""
-	def setParent(self, node):
-		return None
+    @type node: AVLNode
+    @param node: a node
+    """
+
+    def setParent(self, node):
+        self.parent = node
 
 	"""sets value
 
-	@type value: str
-	@param value: data
-	"""
-	def setValue(self, value):
-		return None
+    @type value: str
+    @param value: data
+    """
+
+    def setValue(self, value):
+        self.value = value
 
 	"""sets the balance factor of the node
 
-	@type h: int
-	@param h: the height
-	"""
-	def setHeight(self, h):
-		return None
+    @type h: int
+    @param h: the height
+    """
+
+    def setHeight(self, h):
+        self.height = h
 
 	"""returns whether self is not a virtual node 
 
 	@rtype: bool
 	@returns: False if self is a virtual node, True otherwise.
 	"""
-	def isRealNode(self):
-		return False
+    def isRealNode(self):
+		return self.height == -1
 
 
 
@@ -219,13 +240,27 @@ class AVLTreeList(object):
 			node = node.right
 		return Node.value
 
-	"""returns an array representing list 
+    """returns an array representing list 
 
-	@rtype: list
-	@returns: a list of strings representing the data structure
-	"""
-	def listToArray(self):
-		return None
+    @rtype: list
+    @returns: a list of strings representing the data structure
+    """
+
+    def inOrder(self, node, action):
+        if node is None or not node.isRealNode():
+            return
+        self.inOrder(node.getLeft(), action)
+        action(node)
+        self.inOrder(node.getRight(), action)
+        return
+
+    def listToArray(self):
+        result = []
+
+        insertToResult = lambda node: result.append(node.getValue())
+
+        self.inOrder(self.root, insertToResult)
+        return result
 
 	"""returns the size of the list 
 
@@ -281,3 +316,4 @@ class AVLTreeList(object):
 			return self.root
 
 
+fakeNode = AVLNode(None)
