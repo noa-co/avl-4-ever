@@ -20,7 +20,7 @@ class AVLNode(object):
 		self.right = None
 		self.parent = None
 		self.height = -1
-		
+		self.size = 1
 
 	"""returns the left child
 	@rtype: AVLNode
@@ -124,6 +124,7 @@ class AVLTreeList(object):
 	"""
 	def __init__(self):
 		self.root = None
+		self.size = 0
 		# add your fields here
 
 
@@ -133,7 +134,11 @@ class AVLTreeList(object):
 	@returns: True if the list is empty, False otherwise
 	"""
 	def empty(self):
-		return None
+		if self.size == 0:
+			return True
+		return False
+
+
 
 
 	"""retrieves the value of the i'th item in the list
@@ -145,7 +150,22 @@ class AVLTreeList(object):
 	@returns: the the value of the i'th item in the list
 	"""
 	def retrieve(self, i):
-		return None
+		if i > self.size - 1 or i < 0 :
+			return None
+		return retriveRec(i,self.root)
+
+
+	def retrieveRec(i,node):
+		if node.left.getSize()  == i:
+			return node.value
+		elif node.left.getSize() < i:
+			return retrievRec(i - node.left.getSize() - 1, node.right)
+		elif node.left.getSize() > i:
+			return retrievRec(i,node.left)
+
+
+
+
 
 	"""inserts val at position i in the list
 
@@ -179,7 +199,12 @@ class AVLTreeList(object):
 	@returns: the value of the first item, None if the list is empty
 	"""
 	def first(self):
-		return None
+		if self.empty():
+			return None
+		node = self.root
+		while node.left.isRealNode():
+			node = node.left
+		return node.value
 
 	"""returns the value of the last item in the list
 
@@ -187,7 +212,12 @@ class AVLTreeList(object):
 	@returns: the value of the last item, None if the list is empty
 	"""
 	def last(self):
-		return None
+		if self.empty():
+			return None
+		node = self.root
+		while node.right.isRealNode():
+			node = node.right
+		return Node.value
 
 	"""returns an array representing list 
 
@@ -203,7 +233,7 @@ class AVLTreeList(object):
 	@returns: the size of the list
 	"""
 	def length(self):
-		return None
+		return self.size
 
 	"""splits the list at the i'th index
 
@@ -245,6 +275,9 @@ class AVLTreeList(object):
 	@returns: the root, None if the list is empty
 	"""
 	def getRoot(self):
-		return None
+		if self.size == 0:
+			return None
+		else:
+			return self.root
 
 
