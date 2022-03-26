@@ -240,27 +240,36 @@ class AVLTreeList(object):
 			node = node.right
 		return Node.value
 
-    """returns an array representing list 
+	"""performs an inOrder scan using an action on all nodes by scan order
+	
+	@type node: AVLNode
+	@param val: current node searched from
+	@type action: function
+	@param val: function to call on all nodes by order
+	
+	"""
 
-    @rtype: list
-    @returns: a list of strings representing the data structure
-    """
+	def inOrder(self, node, action):
+		if node is None or not node.isRealNode():
+			return
+		self.inOrder(node.getLeft(), action)
+		action(node)
+		self.inOrder(node.getRight(), action)
+		return
 
-    def inOrder(self, node, action):
-        if node is None or not node.isRealNode():
-            return
-        self.inOrder(node.getLeft(), action)
-        action(node)
-        self.inOrder(node.getRight(), action)
-        return
+	"""returns an array representing list 
 
-    def listToArray(self):
-        result = []
+	@rtype: list
+	@returns: a list of strings representing the data structure
+	"""
 
-        insertToResult = lambda node: result.append(node.getValue())
+	def listToArray(self):
+		result = []
 
-        self.inOrder(self.root, insertToResult)
-        return result
+		insertToResult = lambda node: result.append(node.getValue())
+
+		self.inOrder(self.root, insertToResult)
+		return result
 
 	"""returns the size of the list 
 
@@ -291,6 +300,16 @@ class AVLTreeList(object):
 	"""
 	def concat(self, lst):
 		return None
+
+	"""searches for the first (in order) node that contains value
+
+	@type val: str
+	@param val: a value to be searched
+	@type node: AVLNode
+	@param val: current node searched from
+	@rtype: (AVLNode, int) tuple
+	@returns: the first node that contains val and its index, node is None if not found.
+	"""
 
 	def inOrderSearch(self, node, val):
 		if node is None or not node.isRealNode():
