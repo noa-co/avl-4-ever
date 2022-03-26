@@ -292,6 +292,17 @@ class AVLTreeList(object):
 	def concat(self, lst):
 		return None
 
+	def inOrderSearch(self, node, val):
+		if node is None or not node.isRealNode():
+			return None, 0
+		left_return_node, count_left = self.inOrderSearch(node.getLeft(), val)
+		if left_return_node is not None:
+			return left_return_node, count_left
+		if val == node.getValue():
+			return node, count_left
+		right_return_node, count_right = self.inOrderSearch(node.getRight(), val)
+		return right_return_node, count_left + count_right + 1
+
 	"""searches for a *value* in the list
 
 	@type val: str
@@ -299,9 +310,12 @@ class AVLTreeList(object):
 	@rtype: int
 	@returns: the first index that contains val, -1 if not found.
 	"""
-	def search(self, val):
-		return None
 
+	def search(self, val):
+		found, found_index = self.inOrderSearch(self.root, val)
+		if found is None:
+			return -1
+		return found_index
 
 
 	"""returns the root of the tree representing the list
