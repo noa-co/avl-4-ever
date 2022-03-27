@@ -11,50 +11,50 @@
 class AVLNode(object):
 	"""Constructor, you are allowed to add more fields. 
 
-    @type value: str
-    @param value: data of your node
-    """
+	@type value: str
+	@param value: data of your node
+	"""
 
-    def __init__(self, value):
-        self.value = value
-        self.left = fakeNode
-        self.right = fakeNode
-        self.parent = None
-        self.height = -1
-        self.size = 1
+	def __init__(self, value):
+		self.value = value
+		self.left = fakeNode
+		self.right = fakeNode
+		self.parent = None
+		self.height = -1
+		self.size = 1
 
-    """returns the left child
-    @rtype: AVLNode
-    @returns: the left child of self, None if there is no left child
-    """
+	"""returns the left child
+	@rtype: AVLNode
+	@returns: the left child of self, None if there is no left child
+	"""
 
-    def getLeft(self):
-        return self.left
+	def getLeft(self):
+		return self.left
 
-    """returns the right child
+	"""returns the right child
 
-    @rtype: AVLNode
-    @returns: the right child of self, None if there is no right child
-    """
+	@rtype: AVLNode
+	@returns: the right child of self, None if there is no right child
+	"""
 
-    def getRight(self):
-        return self.right
+	def getRight(self):
+		return self.right
 
 	"""returns the parent 
 
-    @rtype: AVLNode
-    @returns: the parent of self, None if there is no parent
-    """
+	@rtype: AVLNode
+	@returns: the parent of self, None if there is no parent
+	"""
 
-    def getParent(self):
-        return self.parent
+	def getParent(self):
+		return self.parent
 
 	"""returns the size 
 
 	@rtype: AVLNode
 	@returns: the size of self, 0 if the node is virtual
 	"""
-    def getSize(self):
+	def getSize(self):
 		if self.isRealNode():
 			return 0
 		return self.size
@@ -62,73 +62,73 @@ class AVLNode(object):
 
 	"""return the value
 
-    @rtype: str
-    @returns: the value of self, None if the node is virtual
-    """
+	@rtype: str
+	@returns: the value of self, None if the node is virtual
+	"""
 
-    def getValue(self):
-        return self.value
+	def getValue(self):
+		return self.value
 
 	"""returns the height
 
-    @rtype: int
-    @returns: the height of self, -1 if the node is virtual
-    """
+	@rtype: int
+	@returns: the height of self, -1 if the node is virtual
+	"""
 
-    def getHeight(self):
-        return self.height
+	def getHeight(self):
+		return self.height
 
 	"""sets left child
 
-    @type node: AVLNode
-    @param node: a node
-    """
+	@type node: AVLNode
+	@param node: a node
+	"""
 
-    def setLeft(self, node):
-        self.left = node
+	def setLeft(self, node):
+		self.left = node
 
 	"""sets right child
 
-    @type node: AVLNode
-    @param node: a node
-    """
+	@type node: AVLNode
+	@param node: a node
+	"""
 
-    def setRight(self, node):
-        self.right = node
+	def setRight(self, node):
+		self.right = node
 
 	"""sets parent
 
-    @type node: AVLNode
-    @param node: a node
-    """
+	@type node: AVLNode
+	@param node: a node
+	"""
 
-    def setParent(self, node):
-        self.parent = node
+	def setParent(self, node):
+		self.parent = node
 
 	"""sets value
 
-    @type value: str
-    @param value: data
-    """
+	@type value: str
+	@param value: data
+	"""
 
-    def setValue(self, value):
-        self.value = value
+	def setValue(self, value):
+		self.value = value
 
 	"""sets the balance factor of the node
 
-    @type h: int
-    @param h: the height
-    """
+	@type h: int
+	@param h: the height
+	"""
 
-    def setHeight(self, h):
-        self.height = h
+	def setHeight(self, h):
+		self.height = h
 
 	"""returns whether self is not a virtual node 
 
 	@rtype: bool
 	@returns: False if self is a virtual node, True otherwise.
 	"""
-    def isRealNode(self):
+	def isRealNode(self):
 		return self.height == -1
 
 
@@ -279,6 +279,19 @@ class AVLTreeList(object):
 	def length(self):
 		return self.size
 
+	"""retrieves the node of the i'th item in the list
+
+		@type i: int
+		@pre: 0 <= i < self.length()
+		@param i: index in the list
+		@rtype: AVLNode
+		@returns: the node of the i'th item in the list
+		"""
+
+	def retrieveNode(self, i):
+		# todo modify retrieve to use this and extract value
+		return fakeNode
+
 	"""splits the list at the i'th index
 
 	@type i: int
@@ -289,7 +302,28 @@ class AVLTreeList(object):
 	right is an AVLTreeList representing the list from index i+1, and val is the value at the i'th index.
 	"""
 	def split(self, i):
-		return None
+		node = self.retrieveNode(self, i)
+		if node is None or not node.isRealNode():
+			return [None, None, None]
+
+		val = node.getValue()
+		if self.root is None or not self.root.isRealNode():
+			return [None, val, None]
+
+		left_subtree = node.getLeft()
+		right_subtree = node.getRight()
+		parent = node.getParent()
+
+		while parent is not None and parent.isRealNode():
+			if parent.getRight() == node:
+				left_subtree = self.join(parent.getLeft(), parent, left_subtree)
+			else:
+				right_subtree = self.join(right_subtree, parent, parent.getRight())
+
+			node = parent
+			parent = parent.getParent()
+
+		return [left_subtree, val, node.getValue()]
 
 	"""concatenates lst to self
 
@@ -299,7 +333,24 @@ class AVLTreeList(object):
 	@returns: the absolute value of the difference between the height of the AVL trees joined
 	"""
 	def concat(self, lst):
+		node_to_join = self.last()
+		self.delete(self.size-1)  # size-1 is the index of last
+		joined = self.join(self.root, node_to_join, lst)
+		# todo calc difference between heights?
 		return None
+
+	"""joins lst1 to lst 2 with node as the root
+
+	@type lst1,lst2: AVLTreeList
+	@param lst1,lst2: lists to be joined
+	@type node: AVLNode
+	@param node: node to become new root of joined
+	@rtype: int
+	@returns: the joined lst
+	"""
+	def join(self, lst1, node, lst2):
+		pass #todo and make sure balanced
+		return AVLTreeList()
 
 	"""searches for the first (in order) node that contains value
 
