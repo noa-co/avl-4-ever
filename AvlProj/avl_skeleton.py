@@ -9,7 +9,7 @@
 """A class represnting a node in an AVL tree"""
 
 class AVLNode(object):
-	"""Constructor, you are allowed to add more fields. 
+	"""Constructor, you are allowed to add more fields.
 
 	@type value: str
 	@param value: data of your node
@@ -334,23 +334,81 @@ class AVLTreeList(object):
 	"""
 	def concat(self, lst):
 		node_to_join = self.last()
+		height_diff = abs(self.root.getHeight() - lst.root.getHeight())
 		self.delete(self.size-1)  # size-1 is the index of last
-		joined = self.join(self.root, node_to_join, lst)
-		# todo calc difference between heights?
-		return None
+		self.join(self.root, node_to_join, lst)
+
+		return height_diff
 
 	"""joins lst1 to lst 2 with node as the root
 
 	@type lst1,lst2: AVLTreeList
 	@param lst1,lst2: lists to be joined
 	@type node: AVLNode
-	@param node: node to become new root of joined
-	@rtype: int
+	@param node: node to connect between trees
+	@rtype: AVLTreeList
 	@returns: the joined lst
 	"""
 	def join(self, lst1, node, lst2):
-		pass #todo and make sure balanced
-		return AVLTreeList()
+		if lst1 is None or not lst1.root.isRealNode():
+			lst2.insert(0, node.getValue())
+			return lst2
+
+		if lst2 is None or not lst2.root.isRealNode():
+			lst1.insert((lst1.size-1), node.getValue())
+			return lst1
+
+		left_height = lst1.root.getHeight()
+		right_height = lst2.root.getHeight()
+
+		if left_height <= right_height:
+			joined_lst = self.joinTallerRight(lst2, lst1, node, left_height)
+		else:
+			joined_lst = self.joinTallerLeft(lst1, lst2, node, right_height)
+
+		return joined_lst
+
+	"""joins tall_lst and small_lst with node as the connector node, 
+	whilst part of the taller tree will be the left subtree of node
+	
+	@precondition: tall_lst is taller than small lst
+	@type tall_lst,small_lst: AVLTreeList
+	@param tall_lst,small_lst: lists to be joined
+	@type node: AVLNode
+	@param node: node to connect between trees
+	@rtype: AVLTreeList
+	@returns: the joined lst
+	"""
+	def joinTallerLeft(self, tall_lst, small_lst, node, small_height):
+		lower_son = tall_lst.findRightSubtreeByHeight(small_height)
+		lower_parent = lower_son.getParent()
+		node.setLeft(lower_son)
+		node.setRight(small_lst.root)
+		node.setParent(lower_parent)
+		lower_parent.setRight(node)
+		# todo make sure balanced
+		return tall_lst
+
+	"""joins tall_lst and small_lst with node as the connector node, 
+	whilst part of the taller tree will be the right subtree of node
+
+	@precondition: tall_lst is taller than small lst
+	@type tall_lst,small_lst: AVLTreeList
+	@param tall_lst,small_lst: lists to be joined
+	@type node: AVLNode
+	@param node: node to connect between trees
+	@rtype: AVLTreeList
+	@returns: the joined lst
+	"""
+	def joinTallerRight(self, tall_lst, small_lst, node, small_height):
+		lower_son = tall_lst.findLeftSubtreeByHeight(small_height)
+		lower_parent = lower_son.getParent()
+		node.setLeft(small_lst.root)
+		node.setRight(lower_son)
+		node.setParent(lower_parent)
+		lower_parent.setLeft(node)
+		# todo make sure balanced
+		return tall_lst
 
 	"""searches for the first (in order) node that contains value
 
