@@ -4,7 +4,7 @@
 # id2      - 205882236
 # name2    - eyal cohen
 
-#todo later when we have time:
+# todo later when we have time:
 # documentations
 # better code - all rotations are repeated code, check rotations, everything
 # not sure if we need to save bf cause we are calculating it by height - ask eyal
@@ -92,10 +92,9 @@ class AVLNode(object):
 		@rtype: int
 		@returns: the balance factor of self
 	"""
+
 	def getBF(self):
 		return self.bf
-
-
 
 	"""sets left child
 
@@ -221,7 +220,6 @@ class AVLTreeList(object):
 		node = self.retrieveRec(i, self.root)
 		return node.getValue()
 
-
 	"""inserts val at position i in the list
 
 	@type i: int
@@ -256,27 +254,19 @@ class AVLTreeList(object):
 				optional_parent_node.setRight(new_node)
 				return self.setParentAndRebalance(new_node, optional_parent_node)
 
-	#todo documentation
+	# todo documentation
 	def setParentAndRebalance(self, new_node, optional_parent_node):
 		new_node.setParent(optional_parent_node)
-		num_rebalance_op = self.fixbfInsert(optional_parent_node)
-		self.fixNodesSizeInsert(optional_parent_node)
+		num_rebalance_op = self.fixbf(optional_parent_node)
+		self.fixNodesSize(optional_parent_node, 1)
 		return num_rebalance_op
 
-	# todo documentation
-	def fixNodesSizeInsert(self, node):
-		while node is not None:
-			node.increaseSizeBy(1)
-			node = node.getParent()
-		return None
-
-	# todo documentation
-	def fixbfInsert(self, node):
+	def fixbf(self, node, stopAfterRotate=True):
 		counter = 0
 		while node is not None:
 			left_height = node.getLeft().getHeight()
 			right_height = node.getRight().getHeight()
-			node.setBF(left_height-right_height)
+			node.setBF(left_height - right_height)
 
 			new_height = max(right_height, left_height + 1)
 			# assuming new node (leaf) height = 0, meaning node height didn't change
@@ -289,90 +279,108 @@ class AVLTreeList(object):
 
 			# returning cause one rotation is enough in insert
 			elif abs(node.getBF()) > 1:  # rotation is needed
-				r = self.checkRotationNeeded(node)
+				r = self.checkRotationNeeded(node, True)
 				if r == 1:  # left rotation
-					return self.leftRotation(counter, node)
+					counter = self.leftRotation(counter, node)
 				elif r == 2:  # rl rotation
-					return self.RightLeftRotation(counter, node)
+					counter = self.rightLeftRotation(counter, node)
 				elif r == 3:  # right rotation
-					return self.RightRotation(counter, node)
+					counter = self.rightRotation(counter, node)
 				elif r == 4:  # lr rotation
-					return self.LeftRightRotation(counter, node)
+					counter = self.leftRightRotation(counter, node)
+				if stopAfterRotate:
+					return counter
 			node = node.getParent()
 		return counter
 
 	# todo documentation
-	def LeftRightRotation(self, counter, node):
-		counter += 2
-		node.setLeft(self.leftrotation(node.getLeft()))
-		if node == self.root:
-			self.root = self.rightrotaion(node)
-		else:
-			x = node.getParent()
-			new_left = self.rightrotaion(node)
-			new_left.setParent(x)
-			x.setLeft(new_left)
-		return counter
-
-	# todo documentation
-	def RightRotation(self, counter, node):
-		counter += 1
-		if node == self.root:
-			self.root = self.rightrotaion(node)
-			self.root.setParent(None)
-		else:
-			x = node.getParent()
-			y = self.rightrotaion(node)
-			x.setLeft(y)
-			y.setParent(x)
-		return counter
-
-	# todo documentation
-	def RightLeftRotation(self, counter, node):
-		counter += 2
-		node.setRight(self.rightrotaion(node.getRight()))
-		if node == self.root:
-			self.root = self.leftrotation(node)
-		else:
-			x = node.getParent()
-			new_right = self.leftrotation(node)
-			new_right.setParent(x)
-			x.setRight(new_right)
-		return counter
-
-	def leftRotation(self, counter, node):
-		counter += 1
-		if node == self.root:
-			self.root = self.leftrotation(node)
-		else:
-			x = node.parent
-			y = self.leftrotation(node)
-			x.right = y
-			y.parent = x
-		return counter
-
-	# todo documentation
-	def checkRotationNeeded(self, node):
+	def checkRotationNeeded(self, node, forDelete=False):
 		right = node.getRight()
 		left = node.getLeft()
-		bf = node.getBF()
-
+		bf = node.getBF
 		if right.isRealNode():
-			right_bf = right.getBF()
-			if bf == -2 and right_bf == -1:
+			right_bf = right.getLeft().getHeight() - right.getRight.getHeight()
+			if bf == -2 and (right_bf == -1 or (forDelete and right_bf == 0)):
 				return 1  # left rotation
 			elif bf == -2 and right_bf == 1:
 				return 2  # right and than left rotation
-
 		if left.isRealNode():
-			left_bf = left.getBF()
-			if bf == 2 and left_bf == 1:
+			left_bf = left.getLeft().getHeight() - left.getRight.getHeight()
+			if bf == 2 and (left_bf == 1 or (forDelete and left_bf == 0)):
 				return 3  # right rotation
 			elif bf == 2 and left_bf == -1:
-				return 4  # left and than right rotation
+				return 4  # left and than right roataion
 
 	# todo documentation
-	def rightrotaion(self, z):
+	def leftRightRotation(self, counter, node):
+		counter += 2
+		node.setLeft(self.rotateLeft(node.getLeft()))
+		if node == self.root:
+			self.root = self.rotateRight(node)
+			return counter
+
+		x = node.getParent()
+		new_son = self.rotateRight(node)
+		new_son.setParent(x)
+		if x.getLeft() == node:
+			x.setLeft(new_son)
+		else:
+			x.setRight(new_son)
+		return counter
+
+	# todo documentation
+	def rightRotation(self, counter, node):
+		counter += 1
+		if node == self.root:
+			self.root = self.rotateRight(node)
+			self.root.setParent(None)
+			return counter
+
+		x = node.getParent()
+		y = self.rotateRight(node)
+		y.setParent(x)
+		if x.getLeft() == node:
+			x.setLeft(y)
+		else:
+			x.setRight(y)
+		return counter
+
+	# todo documentation
+	def rightLeftRotation(self, counter, node):
+		counter += 2
+		node.setRight(self.rotateRight(node.getRight()))
+		if node == self.root:
+			self.root = self.rotateLeft(node)
+			self.root.setParent(None)
+			return counter
+
+		x = node.getParent()
+		new_son = self.rotateLeft(node)
+		new_son.setParent(x)
+		if x.getLeft() == node:
+			x.setLeft(new_son)
+		else:
+			x.setRight(new_son)
+		return counter
+
+	# todo documentation
+	def leftRotation(self, counter, node):
+		counter += 1
+		if node == self.root:
+			self.root = self.rotateLeft(node)
+			self.root.setParent(None)
+			return counter
+		parent = node.getParent()
+		y = self.rotateLeft(node)
+		y.setParent(parent)
+		if parent.getLeft() == node:
+			parent.setLeft(y)
+		else:
+			parent.setRight(y)
+		return counter
+
+	# todo documentation
+	def rotateRight(self, z):
 		y = z.getLeft()
 		new_z_left = y.getRight()
 		y.setRight(z)
@@ -388,7 +396,7 @@ class AVLTreeList(object):
 		return y
 
 	# todo documentation
-	def leftrotation(self, z):
+	def rotateLeft(self, z):
 		y = z.getRight()
 		new_z_right = y.getLeft()
 		y.setLeft(z)
@@ -396,7 +404,7 @@ class AVLTreeList(object):
 		z.setParent(y)
 		z.setRight(new_z_right)
 		new_z_right.setParent(z)
-		new_z_height = max(z.getLeft().getHeight(), new_z_right.getHeight()) +1
+		new_z_height = max(z.getLeft().getHeight(), new_z_right.getHeight()) + 1
 		z.setHeight(new_z_height)
 		y.height = max(new_z_height, y.getRight().getHeight()) + 1
 		y.setSize(z.getSize())
@@ -491,132 +499,16 @@ class AVLTreeList(object):
 
 	# todo add documentation
 	def rebalanceAndCount(self, succ_parent):
-		self.fixNodesSizeDelete(succ_parent)
-		num_rebalance_op = self.fixbfDelete(succ_parent)
+		self.fixNodesSize(succ_parent, -1)
+		num_rebalance_op = self.fixbf(succ_parent, False)
 		self.size -= 1
 		return num_rebalance_op
 
-	def fixbfDelNew(self, node):
-		counter = 0
+	# todo documentation
+	def fixNodesSize(self, node, incrementBy):
 		while node is not None:
-			left_height = node.getLeft().getHeight()
-			right_height = node.getRight().getHeight()
-			node.setBF(left_height-right_height)
-
-			new_height = max(right_height, left_height + 1)
-			# assuming new node (leaf) height = 0, meaning node height didn't change
-			if node.getHeight() == new_height and abs(node.getBF()) < 2:
-				break
-
-			elif abs(node.getBF()) < 2:  # node's height has changed but rotation not needed
-				node.setHeight(new_height)
-				counter += 1
-
-			# returning cause one rotation is enough in insert
-			elif abs(node.getBF()) > 1:  # rotation is needed
-				r = self.checkRotationNeededDeletion(node)
-				if r == 1:  # left rotation
-					return self.leftRotationDelete(counter, node)
-				elif r == 2:  # rl rotation
-					return self.RightLeftRotationDelete(counter, node)
-				elif r == 3:  # right rotation
-					return self.RightRotationDelete(counter, node)
-				elif r == 4:  # lr rotation
-					return self.LeftRightRotationDelete(counter, node)
+			node.increaseSizeBy(incrementBy)
 			node = node.getParent()
-		return counter
-
-	# todo documentation
-	def LeftRightRotationDelete(self, counter, node):
-		counter += 2
-		node.setLeft(self.leftrotation(node.getLeft()))
-		if node == self.root:
-			self.root = self.rightrotaion(node)
-			return counter
-
-		x = node.getParent()
-		new_son = self.rightrotaion(node)
-		new_son.setParent(x)
-		if x.getLeft() == node:
-			x.setLeft(new_son)
-		else:
-			x.setRight(new_son)
-		return counter
-
-	# todo documentation
-	def RightRotationDelete(self, counter, node):
-		counter += 1
-		if node == self.root:
-			self.root = self.rightrotaion(node)
-			self.root.setParent(None)
-			return counter
-
-		x = node.getParent()
-		y = self.rightrotaion(node)
-		y.setParent(x)
-		if x.getLeft() == node:
-			x.setLeft(y)
-		else:
-			x.setRight(y)
-		return counter
-
-	# todo documentation
-	def RightLeftRotationDelete(self, counter, node):
-		counter += 2
-		node.setRight(self.rightrotaion(node.getRight()))
-		if node == self.root:
-			self.root = self.leftrotation(node)
-			self.root.setParent(None)
-			return counter
-
-		x = node.getParent()
-		new_son = self.leftrotation(node)
-		new_son.setParent(x)
-		if x.getLeft() == node:
-			x.setLeft(new_son)
-		else:
-			x.setRight(new_son)
-		return counter
-
-	# todo documentation
-	def leftRotationDelete(self, counter, node):
-		counter += 1
-		if node == self.root:
-			self.root = self.leftrotation(node)
-			self.root.setParent(None)
-			return counter
-		parent = node.getParent()
-		y = self.leftrotation(node)
-		y.setParent(parent)
-		if parent.getLeft() == node:
-			parent.setLeft(y)
-		else:
-			parent.setRight(y)
-		return counter
-
-	def checkRotationNeededDeletion(self, node):
-		right = node.getRight()
-		left = node.getLeft()
-		bf = node.getBF
-		if right.isRealNode():
-			right_bf = right.getLeft().getHeight() - right.getRight.getHeight()
-			if bf == -2 and (right_bf == -1 or right_bf == 0):
-				return 1  # left rotation
-			elif bf == -2 and right_bf == 1:
-				return 2  # right and than left rotation
-		if left.isRealNode():
-			left_bf = left.getLeft().getHeight() - left.getRight.getHeight()
-			if bf == 2 and (left_bf == 1 or left_bf == 0):
-				return 3  # right rotation
-			elif bf == 2 and left_bf == -1:
-				return 4  # left and than right roataion
-
-	# todo documentation
-	def fixNodesSizeDelete(self, node):
-		while node is not None:
-			node.increaseSizeBy(-1)
-			node = node.getParent()
-		return None
 
 	# todo documentation
 	def find_successor(self, node):
@@ -632,12 +524,8 @@ class AVLTreeList(object):
 	"""
 
 	def first(self):
-		if self.empty():
-			return None
-		node = self.root
-		while node.getLeft().isRealNode():
-			node = node.getLeft()
-		return node.getValue()
+		get_left = lambda node: node.getLeft()
+		return self.getTreeEdge(get_left)
 
 	"""returns the value of the last item in the list
 
@@ -646,11 +534,23 @@ class AVLTreeList(object):
 	"""
 
 	def last(self):
+		get_right = lambda node: node.getRight()
+		return self.getTreeEdge(get_right)
+
+	"""returns the value of the item in the list that is in edge left or right
+	
+	@type getSide: lambda
+	@param getSide: a function that returns left son or right son of node
+	@rtype: str
+	@returns: the value of the last item, None if the list is empty
+	"""
+
+	def getTreeEdge(self, getSide):
 		if self.empty():
 			return None
 		node = self.root
-		while node.getRight().isRealNode():
-			node = node.getRight()
+		while getSide(node).isRealNode():
+			node = getSide(node)
 		return node.getValue()
 
 	"""performs an inOrder scan using an action on all nodes by scan order
@@ -717,6 +617,7 @@ class AVLTreeList(object):
 	@rtype: AVLNode
 	@returns: the node of the i'th item in the list
 	"""
+
 	def retrieveRec(self, i, node):
 		left_size = node.getLeft().getSize()
 		if left_size == i:
