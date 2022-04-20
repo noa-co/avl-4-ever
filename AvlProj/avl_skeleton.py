@@ -261,8 +261,16 @@ class AVLTreeList(object):
 	def setParentAndRebalance(self, new_node, optional_parent_node):
 		new_node.setParent(optional_parent_node)
 		num_rebalance_op = self.fixbf(optional_parent_node)
+		''' eyal hayakar, i had a problem in this case of insertion and my solution isnt working.
+		The problem was that there were cases in which after fixing the tree in fixbf the parent of the
+		inserted node was no longer optimal_parent_node and then we increased the size of optimal parent but 
+		that was a mistake and made it have +1 to the actual value.
+		so i tried setting it to the real parent but that creates bugs as well.
+		Ive decided to leave this problem to you - the insertion master.
+		Good luck!
+		'''
 		if new_node.getParent() != optional_parent_node:
-			optional_parent_node = new_node
+			optional_parent_node = new_node.getParent()
 		self.fixNodesSize(optional_parent_node, 1)
 		return num_rebalance_op
 
