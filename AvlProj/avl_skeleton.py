@@ -240,6 +240,7 @@ class AVLTreeList(object):
 
 		if self.root is None:
 			self.root = new_node
+			return 0
 		elif i == self.size-1:
 			node = self.root
 			while node.getRight().isRealNode():
@@ -260,6 +261,8 @@ class AVLTreeList(object):
 	def setParentAndRebalance(self, new_node, optional_parent_node):
 		new_node.setParent(optional_parent_node)
 		num_rebalance_op = self.fixbf(optional_parent_node)
+		if new_node.getParent() != optional_parent_node:
+			optional_parent_node = new_node
 		self.fixNodesSize(optional_parent_node, 1)
 		return num_rebalance_op
 
@@ -270,7 +273,7 @@ class AVLTreeList(object):
 			right_height = node.getRight().getHeight()
 			node.setBF(left_height - right_height)
 
-			new_height = max(right_height, left_height + 1)
+			new_height = max(right_height, left_height) + 1
 			# assuming new node (leaf) height = 0, meaning node height didn't change
 			if node.getHeight() == new_height and abs(node.getBF()) < 2:
 				break
@@ -299,15 +302,15 @@ class AVLTreeList(object):
 	def checkRotationNeeded(self, node, forDelete=False):
 		right = node.getRight()
 		left = node.getLeft()
-		bf = node.getBF
+		bf = node.getBF()
 		if right.isRealNode():
-			right_bf = right.getLeft().getHeight() - right.getRight.getHeight()
+			right_bf = right.getBF()
 			if bf == -2 and (right_bf == -1 or (forDelete and right_bf == 0)):
 				return 1  # left rotation
 			elif bf == -2 and right_bf == 1:
 				return 2  # right and than left rotation
 		if left.isRealNode():
-			left_bf = left.getLeft().getHeight() - left.getRight.getHeight()
+			left_bf = left.getBF()
 			if bf == 2 and (left_bf == 1 or (forDelete and left_bf == 0)):
 				return 3  # right rotation
 			elif bf == 2 and left_bf == -1:
@@ -456,6 +459,10 @@ class AVLTreeList(object):
 	# todo add documentation
 	def DeleteLeaf(self, node_to_delete):
 		del_parent = node_to_delete.getParent()
+		if del_parent is None:
+			self.root = None
+			self.size = 0
+			return 0
 		if del_parent.getRight() == node_to_delete:  # leaf is a right son
 			del_parent.setRight(fakeNode)
 		else:  # leaf is a left son
@@ -473,7 +480,7 @@ class AVLTreeList(object):
 		if succ_right.isRealNode():
 			succ_right.setParent(succ_parent)
 			num_rebalance_op = self.deleteBySuccessor(succ_parent, succ_right, successorNode)
-			successorNode.setRight(None)
+			successorNode.setRight(fakeNode)
 		else:
 			num_rebalance_op = self.deleteBySuccessor(succ_parent, fakeNode, successorNode)
 		return num_rebalance_op
@@ -482,9 +489,11 @@ class AVLTreeList(object):
 	def deleteWithOneSon(self, node_to_delete, son):
 		del_parent = node_to_delete.getParent()
 		son.setParent(del_parent)
-		if del_parent.getLeft() == node_to_delete:
+		if del_parent is None:
+			self.root = son
+		elif del_parent.getLeft() == node_to_delete:
 			del_parent.setLeft(son)
-		elif del_parent.right == node_to_delete:
+		elif del_parent.getRight() == node_to_delete:
 			del_parent.setRight(son)
 		node_to_delete.setParent(None)
 		num_rebalance = self.rebalanceAndCount(del_parent)
@@ -492,7 +501,9 @@ class AVLTreeList(object):
 
 	# todo add documentation
 	def deleteBySuccessor(self, succ_parent, succ_right, successorNode):
-		if succ_parent.getRight() == successorNode:
+		if succ_parent is None:
+			pass
+		elif succ_parent.getRight() == successorNode:
 			succ_parent.setRight(succ_right)
 		else:
 			succ_parent.setLeft(succ_right)
@@ -527,7 +538,10 @@ class AVLTreeList(object):
 
 	def first(self):
 		get_left = lambda node: node.getLeft()
-		return self.getTreeEdge(get_left).getValue()
+		node = self.getTreeEdge(get_left)
+		if node is None:
+			return None
+		return node.getValue()
 
 	"""returns the value of the last item in the list
 
@@ -537,7 +551,10 @@ class AVLTreeList(object):
 
 	def last(self):
 		get_right = lambda node: node.getRight()
-		return self.getTreeEdge(get_right).getValue()
+		node = self.getTreeEdge(get_right)
+		if node is None:
+			return None
+		return node.getValue()
 
 
 	"""returns the value of the item in the list that is in edge left or right
@@ -643,7 +660,7 @@ class AVLTreeList(object):
 	"""
 
 	def split(self, i):
-		node = self.retrieveNode(self, i)
+		node = self.retrieveNode(i)
 		if node is None or not node.isRealNode():
 			return [None, None, None]
 
@@ -687,9 +704,16 @@ class AVLTreeList(object):
 	def concat(self, lst):
 		get_right = lambda node: node.getRight()
 		node_to_join = self.getTreeEdge(get_right) # gets last node
-		height_diff = abs(self.root.getHeight() - lst.root.getHeight())
+		self_height, lst_height = 0, 0
+		if self.root is not None:
+			self_height = self.root.getHeight()
+		if lst.root is not None:
+			lst_height = lst.root.getHeight()
+		height_diff = abs(self_height - lst_height)
 		self.delete(self.size - 1)  # size-1 is the index of last
-		self.join(self, node_to_join, lst)
+		joined = self.join(self, node_to_join, lst)
+		self.root = joined.root
+		self.size = joined.size
 
 		return height_diff
 
@@ -704,11 +728,11 @@ class AVLTreeList(object):
 	"""
 
 	def join(self, lst1, node, lst2):
-		if lst1 is None or not lst1.root.isRealNode():
+		if lst1 is None or lst1.root is None or not lst1.root.isRealNode():
 			lst2.insert(0, node.getValue())
 			return lst2
 
-		if lst2 is None or not lst2.root.isRealNode():
+		if lst2 is None or lst2.root is None or not lst2.root.isRealNode():
 			lst1.insert((lst1.size - 1), node.getValue())
 			return lst1
 
@@ -720,6 +744,7 @@ class AVLTreeList(object):
 		else:
 			joined_lst = self.joinTallerLeft(lst1, lst2, node, right_height)
 
+		joined_lst.size = lst1.size + lst2.size
 		return joined_lst
 
 	"""joins tall_lst and small_lst with node as the connector node, 
@@ -736,12 +761,15 @@ class AVLTreeList(object):
 
 	def joinTallerLeft(self, tall_lst, small_lst, node, small_height):
 		getRight = lambda n: n.getRight()
-		lower_son = tall_lst.findRightSubtreeByHeight(small_height, getRight)
+		lower_son = tall_lst.findSideSubtreeByHeight(small_height, getRight)
 		lower_parent = lower_son.getParent()
 		node.setLeft(lower_son)
 		node.setRight(small_lst.root)
 		node.setParent(lower_parent)
-		lower_parent.setRight(node)
+		if lower_parent is not None:
+			lower_parent.setRight(node)
+		else:
+			lower_parent = node
 		# todo make sure lower parent is the correct node
 		self.fixbf(lower_parent, False, True)
 		self.fixNodeFieldsJoin(lower_parent)
@@ -772,14 +800,32 @@ class AVLTreeList(object):
 		node.setLeft(small_lst.root)
 		node.setRight(lower_son)
 		node.setParent(lower_parent)
-		lower_parent.setLeft(node)
+		if lower_parent is not None:
+			lower_parent.setLeft(node)
+		else:
+			lower_parent = node
+			tall_lst.root = node
 		# todo make sure lower parent is the correct node
 		self.fixbf(lower_parent, False, True)
 		self.fixNodeFieldsJoin(lower_parent)
 		return tall_lst
 
 	def fixNodeFieldsJoin(self, node):
-		# todo update size and height
+		while node is not None and node.isRealNode():
+			left = node.getLeft()
+			right = node.getRight()
+			left_height, right_height = 0, 0
+			new_size = 0
+			if left is not None and left.isRealNode():
+				left_height = left.getHeight()
+				new_size += left.getSize()
+			if right is not None and right.isRealNode():
+				right_height = right.getHeight()
+				new_size += right.getSize()
+			new_height = max(left_height, right_height) + 1
+			node.setHeight(new_height)
+			node.setSize(new_size + 1)
+			node = node.getParent()
 		return
 
 
@@ -829,6 +875,79 @@ class AVLTreeList(object):
 			return None
 		else:
 			return self.root
+
+	# todo delete this
+	def printt(self):
+		out = ""
+		for row in self.printree(self.root):  # need printree.py file
+			out = out + row + "\n"
+		print(out)
+
+	def printree(self, t, bykey=True):
+		# for row in trepr(t, bykey):
+		#        print(row)
+		return self.trepr(t, False)
+
+	def trepr(self, t, bykey=False):
+		if t == None:
+			return ["#"]
+
+		thistr = str(t.key) if bykey else str(t.getValue())
+
+		return self.conc(self.trepr(t.left, bykey), thistr, self.trepr(t.right, bykey))
+
+	def conc(self, left, root, right):
+
+		lwid = len(left[-1])
+		rwid = len(right[-1])
+		rootwid = len(root)
+
+		result = [(lwid + 1) * " " + root + (rwid + 1) * " "]
+
+		ls = self.leftspace(left[0])
+		rs = self.rightspace(right[0])
+		result.append(ls * " " + (lwid - ls) * "_" + "/" + rootwid *
+					  " " + "\\" + rs * "_" + (rwid - rs) * " ")
+
+		for i in range(max(len(left), len(right))):
+			row = ""
+			if i < len(left):
+				row += left[i]
+			else:
+				row += lwid * " "
+
+			row += (rootwid + 2) * " "
+
+			if i < len(right):
+				row += right[i]
+			else:
+				row += rwid * " "
+
+			result.append(row)
+
+		return result
+
+	def leftspace(self, row):
+		# row is the first row of a left node
+		# returns the index of where the second whitespace starts
+		i = len(row) - 1
+		while row[i] == " ":
+			i -= 1
+		return i + 1
+
+	def rightspace(self, row):
+		# row is the first row of a right node
+		# returns the index of where the first whitespace ends
+		i = 0
+		while row[i] == " ":
+			i += 1
+		return i
+
+	def append(self, val):
+		return self.insert(self.length(), val)
+
+	def getTreeHeight(self):
+		return self.root.getHeight()
 
 
 AVLNode.fakeNode = AVLNode(None)
