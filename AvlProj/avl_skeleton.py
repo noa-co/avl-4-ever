@@ -6,7 +6,6 @@
 
 # todo later when we have time:
 # documentations
-# better code - all rotations are repeated code, check rotations, everything
 # not sure if we need to save bf cause we are calculating it by height - ask eyal
 
 """A class represnting a node in an AVL tree"""
@@ -264,7 +263,7 @@ class AVLTreeList(object):
 		self.fixNodesSize(optional_parent_node, 1)
 		return num_rebalance_op
 
-	def fixbf(self, node, stopAfterRotate=True):
+	def fixbf(self, node, stopAfterRotate=True, forDelete=False):
 		counter = 0
 		while node is not None:
 			left_height = node.getLeft().getHeight()
@@ -282,7 +281,7 @@ class AVLTreeList(object):
 
 			# returning cause one rotation is enough in insert
 			elif abs(node.getBF()) > 1:  # rotation is needed
-				r = self.checkRotationNeeded(node, True)
+				r = self.checkRotationNeeded(node, forDelete)
 				if r == 1:  # left rotation
 					counter = self.leftRotation(counter, node)
 				elif r == 2:  # rl rotation
@@ -503,7 +502,7 @@ class AVLTreeList(object):
 	# todo add documentation
 	def rebalanceAndCount(self, succ_parent):
 		self.fixNodesSize(succ_parent, -1)
-		num_rebalance_op = self.fixbf(succ_parent, False)
+		num_rebalance_op = self.fixbf(succ_parent, False, True)
 		self.size -= 1
 		return num_rebalance_op
 
@@ -730,8 +729,9 @@ class AVLTreeList(object):
 		node.setRight(small_lst.root)
 		node.setParent(lower_parent)
 		lower_parent.setRight(node)
-		# todo make sure balanced
-		# todo update size and height
+		# todo make sure lower parent is the correct node
+		self.fixbf(lower_parent, False, True)
+		self.fixNodeFieldsJoin(lower_parent)
 		return tall_lst
 
 	"""joins tall_lst and small_lst with node as the connector node, 
@@ -753,9 +753,15 @@ class AVLTreeList(object):
 		node.setRight(lower_son)
 		node.setParent(lower_parent)
 		lower_parent.setLeft(node)
-		# todo make sure balanced
-		# todo update size and height
+		# todo make sure lower parent is the correct node
+		self.fixbf(lower_parent, False, True)
+		self.fixNodeFieldsJoin(lower_parent)
 		return tall_lst
+
+	def fixNodeFieldsJoin(self, node):
+		# todo update size and height
+		return
+
 
 	"""searches for the first (in order) node that contains value
 
