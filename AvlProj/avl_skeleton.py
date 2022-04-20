@@ -18,11 +18,12 @@ class AVLNode(object):
 	@type value: str
 	@param value: data of your node
 	"""
+	fakeNode = None
 
 	def __init__(self, value):
 		self.value = value
-		self.left = fakeNode
-		self.right = fakeNode
+		self.left = self.fakeNode
+		self.right = self.fakeNode
 		self.parent = None
 		self.height = -1
 		self.bf = 0
@@ -215,9 +216,11 @@ class AVLTreeList(object):
 	"""
 
 	def retrieve(self, i):
-		if i > self.size - 1 or i < 0:
+		if i > self.size - 1 or i < 0 or self.empty():
 			return None
 		node = self.retrieveRec(i, self.root)
+		if node is None:
+			return None
 		return node.getValue()
 
 	"""inserts val at position i in the list
@@ -238,7 +241,7 @@ class AVLTreeList(object):
 
 		if self.root is None:
 			self.root = new_node
-		elif i == self.size:
+		elif i == self.size-1:
 			node = self.root
 			while node.getRight().isRealNode():
 				node = node.getRight()
@@ -619,6 +622,8 @@ class AVLTreeList(object):
 	"""
 
 	def retrieveRec(self, i, node):
+		if node is None or not node.isRealNode():
+			return
 		left_size = node.getLeft().getSize()
 		if left_size == i:
 			return node
@@ -800,4 +805,5 @@ class AVLTreeList(object):
 			return self.root
 
 
-fakeNode = AVLNode(None)
+AVLNode.fakeNode = AVLNode(None)
+fakeNode = AVLNode.fakeNode
