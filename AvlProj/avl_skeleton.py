@@ -387,6 +387,7 @@ class AVLTreeList(object):
 		node.setParent(lower_parent)
 		lower_parent.setRight(node)
 		# todo make sure balanced
+		#todo update size and height
 		return tall_lst
 
 	"""joins tall_lst and small_lst with node as the connector node, 
@@ -408,6 +409,7 @@ class AVLTreeList(object):
 		node.setParent(lower_parent)
 		lower_parent.setLeft(node)
 		# todo make sure balanced
+		#todo update size and height
 		return tall_lst
 
 	"""searches for the first (in order) node that contains value
