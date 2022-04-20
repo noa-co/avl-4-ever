@@ -455,7 +455,7 @@ class AVLTreeList(object):
 
 	# todo add documentation
 	def DeleteLeaf(self, node_to_delete):
-		del_parent = node_to_delete.getParent
+		del_parent = node_to_delete.getParent()
 		if del_parent.getRight() == node_to_delete:  # leaf is a right son
 			del_parent.setRight(fakeNode)
 		else:  # leaf is a left son
@@ -527,7 +527,7 @@ class AVLTreeList(object):
 
 	def first(self):
 		get_left = lambda node: node.getLeft()
-		return self.getTreeEdge(get_left)
+		return self.getTreeEdge(get_left).getValue()
 
 	"""returns the value of the last item in the list
 
@@ -537,7 +537,8 @@ class AVLTreeList(object):
 
 	def last(self):
 		get_right = lambda node: node.getRight()
-		return self.getTreeEdge(get_right)
+		return self.getTreeEdge(get_right).getValue()
+
 
 	"""returns the value of the item in the list that is in edge left or right
 	
@@ -553,7 +554,7 @@ class AVLTreeList(object):
 		node = self.root
 		while getSide(node).isRealNode():
 			node = getSide(node)
-		return node.getValue()
+		return node
 
 	"""performs an inOrder scan using an action on all nodes by scan order
 	
@@ -650,20 +651,30 @@ class AVLTreeList(object):
 		if self.root is None or not self.root.isRealNode():
 			return [None, val, None]
 
-		left_subtree = node.getLeft()
-		right_subtree = node.getRight()
+		left_subtree_root = node.getLeft()
+		right_subtree_root = node.getRight()
+		left_subtree = self.createTreeListFromRoot(left_subtree_root)
+		right_subtree = self.createTreeListFromRoot(right_subtree_root)
 		parent = node.getParent()
 
 		while parent is not None and parent.isRealNode():
 			if parent.getRight() == node:
-				left_subtree = self.join(parent.getLeft(), parent, left_subtree)
+				new_left_sub = self.createTreeListFromRoot(parent.getLeft())
+				left_subtree = self.join(new_left_sub, parent, left_subtree)
 			else:
-				right_subtree = self.join(right_subtree, parent, parent.getRight())
+				new_right_sub = self.createTreeListFromRoot(parent.getRight())
+				right_subtree = self.join(right_subtree, parent, new_right_sub)
 
 			node = parent
 			parent = parent.getParent()
 
-		return [left_subtree, val, node.getValue()]
+		return [left_subtree, val, right_subtree]
+
+	def createTreeListFromRoot(self, left_subtree_root):
+		left_subtree = AVLTreeList()
+		left_subtree.root = left_subtree_root
+		left_subtree.size = left_subtree_root.getSize()
+		return left_subtree
 
 	"""concatenates lst to self
 
@@ -674,10 +685,11 @@ class AVLTreeList(object):
 	"""
 
 	def concat(self, lst):
-		node_to_join = self.last()
+		get_right = lambda node: node.getRight()
+		node_to_join = self.getTreeEdge(get_right) # gets last node
 		height_diff = abs(self.root.getHeight() - lst.root.getHeight())
 		self.delete(self.size - 1)  # size-1 is the index of last
-		self.join(self.root, node_to_join, lst)
+		self.join(self, node_to_join, lst)
 
 		return height_diff
 
@@ -723,7 +735,8 @@ class AVLTreeList(object):
 	"""
 
 	def joinTallerLeft(self, tall_lst, small_lst, node, small_height):
-		lower_son = tall_lst.findRightSubtreeByHeight(small_height)
+		getRight = lambda n: n.getRight()
+		lower_son = tall_lst.findRightSubtreeByHeight(small_height, getRight)
 		lower_parent = lower_son.getParent()
 		node.setLeft(lower_son)
 		node.setRight(small_lst.root)
@@ -733,6 +746,12 @@ class AVLTreeList(object):
 		self.fixbf(lower_parent, False, True)
 		self.fixNodeFieldsJoin(lower_parent)
 		return tall_lst
+
+	def findSideSubtreeByHeight(self, height, getSide):
+		node = self.root
+		while node.getHeight() > height:
+			node = getSide(node)
+		return node
 
 	"""joins tall_lst and small_lst with node as the connector node, 
 	whilst part of the taller tree will be the right subtree of node
@@ -747,7 +766,8 @@ class AVLTreeList(object):
 	"""
 
 	def joinTallerRight(self, tall_lst, small_lst, node, small_height):
-		lower_son = tall_lst.findLeftSubtreeByHeight(small_height)
+		getLeft = lambda n: n.getLeft()
+		lower_son = tall_lst.findSideSubtreeByHeight(small_height, getLeft)
 		lower_parent = lower_son.getParent()
 		node.setLeft(small_lst.root)
 		node.setRight(lower_son)
