@@ -1,45 +1,48 @@
-#username - nc7
-#id1      - 209223114
-#name1    - noa cohen
-#id2      - 205882236
-#name2    - eyal cohen
+# username - nc7
+# id1      - 209223114
+# name1    - noa cohen
+# id2      - 205882236
+# name2    - eyal cohen
 
-
+#todo later when we have time:
+# documentations
+# better code - all rotations are repeated code, check rotations, everything
+# not sure if we need to save bf cause we are calculating it by height - ask eyal
 
 """A class represnting a node in an AVL tree"""
 
+
 class AVLNode(object):
-	"""Constructor, you are allowed to add more fields. 
+	"""Constructor, you are allowed to add more fields.
 
-    @type value: str
-    @param value: data of your node
-    """
+	@type value: str
+	@param value: data of your node
+	"""
 
-    def __init__(self, value):
-        self.value = value
-        self.left = fakeNode
-        self.right = fakeNode
-        self.parent = None
-        self.height = -1
+	def __init__(self, value):
+		self.value = value
+		self.left = fakeNode
+		self.right = fakeNode
+		self.parent = None
+		self.height = -1
 		self.bf = 0
-        self.size = 1
-		# todo wait eyal why size=0 ?
+		self.size = 1
 
-    """returns the left child
-    @rtype: AVLNode
-    @returns: the left child of self, None if there is no left child
-    """
+	"""returns the left child
+	@rtype: AVLNode
+	@returns: the left child of self, None if there is no left child
+	"""
 
-    def getLeft(self):
+	def getLeft(self):
 		if not self.isRealNode():
 			return None
 		return self.left
 
-    """returns the right child
+	"""returns the right child
 
-    @rtype: AVLNode
-    @returns: the right child of self, None if there is no right child
-    """
+	@rtype: AVLNode
+	@returns: the right child of self, None if there is no right child
+	"""
 
 	def getRight(self):
 		if not self.isRealNode():
@@ -48,128 +51,160 @@ class AVLNode(object):
 
 	"""returns the parent 
 
-    @rtype: AVLNode
-    @returns: the parent of self, None if there is no parent
-    """
+	@rtype: AVLNode
+	@returns: the parent of self, None if there is no parent
+	"""
 
-    def getParent(self):
-        return self.parent
+	def getParent(self):
+		return self.parent
 
 	"""returns the size 
 
 	@rtype: AVLNode
 	@returns: the size of self, 0 if the node is virtual
 	"""
+
 	def getSize(self):
 		if not self.isRealNode():
 			return 0
 		return self.size
 
-
 	"""return the value
 
-    @rtype: str
-    @returns: the value of self, None if the node is virtual
-    """
+	@rtype: str
+	@returns: the value of self, None if the node is virtual
+	"""
 
-    def getValue(self):
-        return self.value
+	def getValue(self):
+		return self.value
 
 	"""returns the height
 
-    @rtype: int
-    @returns: the height of self, -1 if the node is virtual
-    """
+	@rtype: int
+	@returns: the height of self, -1 if the node is virtual
+	"""
 
-    def getHeight(self):
-        return self.height
+	def getHeight(self):
+		return self.height
+
+	"""returns the balance factor
+
+		@rtype: int
+		@returns: the balance factor of self
+	"""
+	def getBF(self):
+		return self.bf
+
+
 
 	"""sets left child
 
-    @type node: AVLNode
-    @param node: a node
-    """
+	@type node: AVLNode
+	@param node: a node
+	"""
 
-    def setLeft(self, node):
-        self.left = node
+	def setLeft(self, node):
+		self.left = node
 
 	"""sets right child
 
-    @type node: AVLNode
-    @param node: a node
-    """
+	@type node: AVLNode
+	@param node: a node
+	"""
 
-    def setRight(self, node):
-        self.right = node
+	def setRight(self, node):
+		self.right = node
 
 	"""sets parent
 
-    @type node: AVLNode
-    @param node: a node
-    """
+	@type node: AVLNode
+	@param node: a node
+	"""
 
-    def setParent(self, node):
-        self.parent = node
+	def setParent(self, node):
+		self.parent = node
 
 	"""sets value
 
-    @type value: str
-    @param value: data
-    """
+	@type value: str
+	@param value: data
+	"""
 
-    def setValue(self, value):
-        self.value = value
+	def setValue(self, value):
+		self.value = value
+
+	"""sets the height of the node
+
+	@type h: int
+	@param h: the height
+	"""
+
+	def setHeight(self, h):
+		self.height = h
 
 	"""sets the balance factor of the node
 
-    @type h: int
-    @param h: the height
-    """
+	@type bf: int
+	@param bf: the height
+	"""
 
-    def setHeight(self, h):
-        self.height = h
+	def setBF(self, bf):
+		self.bf = bf
+
+	"""sets the size of the node
+
+	@type s: int
+	@param s: the size
+	"""
+
+	def setSize(self, s):
+		self.size = s
+
+	"""
+	increases the node size by i
+	
+	@type i: int
+	@param i: number to increase by (or decrease if negative num)
+	"""
+
+	def increaseSizeBy(self, i):
+		self.size = self.size + i
 
 	"""returns whether self is not a virtual node 
 
 	@rtype: bool
 	@returns: False if self is a virtual node, True otherwise.
 	"""
+
 	def isRealNode(self):
 		return self.height != -1
-
-	def getbf(self):
-		return self.bf
-
 
 
 """
 A class implementing the ADT list, using an AVL tree.
 """
 
-class AVLTreeList(object):
 
+class AVLTreeList(object):
 	"""
 	Constructor, you are allowed to add more fields.
 
 	"""
+
 	def __init__(self):
 		self.root = None
 		self.size = 0
-		# add your fields here
 
+	# add your fields here
 
 	"""returns whether the list is empty
 
 	@rtype: bool
 	@returns: True if the list is empty, False otherwise
 	"""
+
 	def empty(self):
-		if self.size == 0:
-			return True
-		return False
-
-
-
+		return self.size == 0
 
 	"""retrieves the value of the i'th item in the list
 
@@ -179,24 +214,22 @@ class AVLTreeList(object):
 	@rtype: str
 	@returns: the the value of the i'th item in the list
 	"""
+
 	def retrieve(self, i):
-		if i > self.size - 1 or i < 0 :
+		if i > self.size - 1 or i < 0:
 			return None
-		return self.retrieveRec(i,self.root)
+		return self.retrieveRec(i, self.root)
 
-
+	# todo add documentation above func
 	def retrieveRec(self, i, node):
-		if node.left.getSize()  == i:
-			return node.value
-		elif node.left.getSize() < i:
-			return self.retrieveRec(i - node.left.getSize() - 1, node.right)
-		elif node.left.getSize() > i:
-			return self.retrieveRec(i,node.left)
+		left_size = node.getLeft().getSize()
+		if left_size == i:
+			return node.getValue()
+		elif left_size < i:
+			return self.retrieveRec(i - left_size - 1, node.getRight())
+		else:
+			return self.retrieveRec(i, node.getLeft())
 
-
-
-
-# todo self.height =0 for new node
 	"""inserts val at position i in the list
 
 	@type i: int
@@ -207,161 +240,197 @@ class AVLTreeList(object):
 	@rtype: list
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
+
 	def insert(self, i, val):
-		newNode = AVLNode(val)
-		if self.root == None:
-			self.root = newNode
-			self.size += 1
+		new_node = AVLNode(val)
+		new_node.setHeight(0)
+		self.size += 1
+
+		if self.root is None:
+			self.root = new_node
 		elif i == self.size:
 			node = self.root
-			while node.right.isRealNode():
-				node = node.right
-			node.right = newNode
-			newNode.parent = node
-			x = self.fixbfInsert(node)
-			self.fixNodesSizeInsert(node)
-			self.size += 1
-			return x
+			while node.getRight().isRealNode():
+				node = node.getRight()
+			node.setRight(new_node)
+			return self.setParentAndRebalance(new_node, node)
 		else:
-			optionalNode = self.retrieveRecNode(i, self.root)
-			if not optionalNode.left.isRealNode():
-				optionalNode.left = newNode
-				newNode.parent = optionalNode
-				x = self.fixbfInsert(optionalNode)
-				self.fixNodesSizeInsert(optionalNode)
-				self.size += 1
-				return x
+			optional_parent_node = self.retrieveRecNode(i, self.root)
+			if not optional_parent_node.getLeft().isRealNode():
+				optional_parent_node.setLeft(new_node)
+				return self.setParentAndRebalance(new_node, optional_parent_node)
 			else:
-				optionalNode = self.find_predecessor(optionalNode)
-				optionalNode.right = newNode
-				newNode.parent = optionalNode
-				x = self.fixbfInsert(optionalNode)
-				self.fixNodesSizeInsert(optionalNode)
-				self.size += 1
-				return x
+				optional_parent_node = self.find_predecessor(optional_parent_node)
+				optional_parent_node.setRight(new_node)
+				return self.setParentAndRebalance(new_node, optional_parent_node)
 
+	#todo documentation
+	def setParentAndRebalance(self, new_node, optional_parent_node):
+		new_node.setParent(optional_parent_node)
+		num_rebalance_op = self.fixbfInsert(optional_parent_node)
+		self.fixNodesSizeInsert(optional_parent_node)
+		return num_rebalance_op
 
-	def fixNodesSizeInsert(self,node):
-		while node != None:
-			node.size += 1
-			node = node.parent
+	# todo documentation
+	def fixNodesSizeInsert(self, node):
+		while node is not None:
+			node.increaseSizeBy(1)
+			node = node.getParent()
 		return None
 
+	# todo documentation
 	def fixbfInsert(self, node):
 		counter = 0
-		while node != None:
-			node.bf = node.left.getHeight() - node.right.getHeight()
-			if node.getHeight() == max(node.right.getHeight(),node.left.getHeight()) + 1 and abs(node.getbf()) < 2: #assuming new node (leaf) height = 0, meaning node height didn't change
+		while node is not None:
+			left_height = node.getLeft().getHeight()
+			right_height = node.getRight().getHeight()
+			node.setBF(left_height-right_height)
+
+			new_height = max(right_height, left_height + 1)
+			# assuming new node (leaf) height = 0, meaning node height didn't change
+			if node.getHeight() == new_height and abs(node.getBF()) < 2:
 				break
-			elif abs(node.getbf()) < 2 : #node's height has changed but rotation not needed
-				node.setHeight(max(node.right.getHeight(), node.left.getHeight()) + 1)
+
+			elif abs(node.getBF()) < 2:  # node's height has changed but rotation not needed
+				node.setHeight(new_height)
 				counter += 1
-			elif abs(node.bf) > 1: #rotaion is needed
+
+			# returning cause one rotation is enough in insert
+			elif abs(node.getBF()) > 1:  # rotation is needed
 				r = self.checkRotationNeeded(node)
-				if r == 1: #left rotation
-					counter += 1
-					if node == self.root:
-						self.root = self.leftrotation(node)
-					else:
-						x = node.parent
-						y = self.leftrotation(node)
-						x.right = y
-						y.parent = x
-					return counter
-				elif r == 2: #rl rotation
-					counter += 2
-					node.right = self.rightrotaion(node.right)
-					if node == self.root:
-						self.root = self.leftrotation(node)
-					else:
-						x = node.parent
-						x.right = self.leftrotation(node)
-						x.right.parent = x
-					return counter
-				elif r == 3: #right rotation
-					counter += 1
-					if node == self.root:
-						self.root = self.rightrotaion(node)
-						self.root.setParent(None)
-					else:
-						x = node.parent
-						y = self.rightrotaion(node)
-						x.left = y
-						y.parent = x
-					return counter
-				elif r == 4: #lr rotation
-					counter += 2
-					node.left = self.leftrotation(node.left)
-					if node == self.root:
-						self.root = self.rightrotaion(node)
-					else:
-						x = node.parent
-						x.left = self.rightrotaion(node)
-						x.left.parent = x
-					return counter
-			node = node.parent
+				if r == 1:  # left rotation
+					return self.leftRotation(counter, node)
+				elif r == 2:  # rl rotation
+					return self.RightLeftRotation(counter, node)
+				elif r == 3:  # right rotation
+					return self.RightRotation(counter, node)
+				elif r == 4:  # lr rotation
+					return self.LeftRightRotation(counter, node)
+			node = node.getParent()
 		return counter
 
+	# todo documentation
+	def LeftRightRotation(self, counter, node):
+		counter += 2
+		node.setLeft(self.leftrotation(node.getLeft()))
+		if node == self.root:
+			self.root = self.rightrotaion(node)
+		else:
+			x = node.getParent()
+			new_left = self.rightrotaion(node)
+			new_left.setParent(x)
+			x.setLeft(new_left)
+		return counter
+
+	# todo documentation
+	def RightRotation(self, counter, node):
+		counter += 1
+		if node == self.root:
+			self.root = self.rightrotaion(node)
+			self.root.setParent(None)
+		else:
+			x = node.getParent()
+			y = self.rightrotaion(node)
+			x.setLeft(y)
+			y.setParent(x)
+		return counter
+
+	# todo documentation
+	def RightLeftRotation(self, counter, node):
+		counter += 2
+		node.setRight(self.rightrotaion(node.getRight()))
+		if node == self.root:
+			self.root = self.leftrotation(node)
+		else:
+			x = node.getParent()
+			new_right = self.leftrotation(node)
+			new_right.setParent(x)
+			x.setRight(new_right)
+		return counter
+
+	def leftRotation(self, counter, node):
+		counter += 1
+		if node == self.root:
+			self.root = self.leftrotation(node)
+		else:
+			x = node.parent
+			y = self.leftrotation(node)
+			x.right = y
+			y.parent = x
+		return counter
+
+	# todo documentation
 	def checkRotationNeeded(self, node):
-		if node.right.isRealNode():
-			if node.bf == -2 and node.right.bf == -1:
-				return 1 #left rotation
-			elif node.bf == -2 and node.right.bf == 1:
-				return 2 #right and than left rotation
-		if node.left.isRealNode():
-			if node.bf == 2 and node.left.bf == 1:
-				return 3 #right rotation
-			elif node.bf == 2 and node.left.bf == -1:
-				return 4 #left and than right roataion
+		right = node.getRight()
+		left = node.getLeft()
+		bf = node.getBF()
 
-	def rightrotaion(self,z):
-		y = z.left
-		t3 = y.right
-		y.right = z
-		y.parent = z.parent
-		z.parent = y
-		z.left = t3
-		t3.parent = z
-		z.height = max(z.left.getHeight(), z.right.getHeight()) + 1
-		y.height = max(y.left.getHeight(), y.right.getHeight()) + 1
-		y.size = z.size
-		z.size = z.right.size + z.left.size + 1
+		if right.isRealNode():
+			right_bf = right.getBF()
+			if bf == -2 and right_bf == -1:
+				return 1  # left rotation
+			elif bf == -2 and right_bf == 1:
+				return 2  # right and than left rotation
+
+		if left.isRealNode():
+			left_bf = left.getBF()
+			if bf == 2 and left_bf == 1:
+				return 3  # right rotation
+			elif bf == 2 and left_bf == -1:
+				return 4  # left and than right rotation
+
+	# todo documentation
+	def rightrotaion(self, z):
+		y = z.getLeft()
+		new_z_left = y.getRight()
+		y.setRight(z)
+		y.setParent(z.getParent())
+		z.setParent(y)
+		z.setLeft(new_z_left)
+		new_z_left.setParent(z)
+		z_new_height = max(new_z_left.getHeight(), z.getRight().getHeight()) + 1
+		z.setHeight(z_new_height)
+		y.setHeight(max(y.getLeft().getHeight(), z_new_height) + 1)
+		y.setSize(z.getSize())
+		z.setSize(z.getRight().getSize() + new_z_left.getSize() + 1)
 		return y
 
-	def leftrotation(self,z):
-		y = z.right
-		t2 = y.left
-		y.left = z
-		y.parent = z.parent
-		z.parent = y
-		z.right = t2
-		t2.parent = z
-		z.height = max(z.left.getHeight(), z.right.getHeight()) + 1
-		y.height = max(y.left.getHeight(), y.right.getHeight()) + 1
-		y.size = z.size
-		z.size = z.right.size + z.left.size + 1
+	# todo documentation
+	def leftrotation(self, z):
+		y = z.getRight()
+		new_z_right = y.getLeft()
+		y.setLeft(z)
+		y.setParent(z.getParent())
+		z.setParent(y)
+		z.setRight(new_z_right)
+		new_z_right.setParent(z)
+		new_z_height = max(z.getLeft().getHeight(), new_z_right.getHeight()) +1
+		z.setHeight(new_z_height)
+		y.height = max(new_z_height, y.getRight().getHeight()) + 1
+		y.setSize(z.getSize())
+		z.setSize(new_z_right.getSize() + z.getLeft().getSize() + 1)
 		return y
 
+	'''
+		todo change to
+		result = retrieveRec(i, node)
+		return result.getValue()
+		'''
+	# todo documentation
 	def retrieveRecNode(self, i, node):
-		if node.left.getSize()  == i:
+		left_size = node.getLeft().getSize()
+		if left_size == i:
 			return node
-		elif node.left.getSize() < i:
-			return self.retrieveRecNode(i - node.left.getSize() - 1, node.right)
-		elif node.left.getSize() > i:
-			return self.retrieveRecNode(i,node.left)
+		elif left_size < i:
+			return self.retrieveRecNode(i - left_size - 1, node.getRight())
+		return self.retrieveRecNode(i, node.getLeft())  # happens when left_size>i
 
+	# todo documentation
 	def find_predecessor(self, node):
-		node = node.left
-		while node.right.isRealNode():
-			node = node.right
+		node = node.getLeft()
+		while node.getRight().isRealNode():
+			node = node.getRight()
 		return node
-
-
-
-
-
-
-
 
 	"""deletes the i'th item in the list
 
@@ -371,220 +440,240 @@ class AVLTreeList(object):
 	@rtype: int
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
+
 	def delete(self, i):
 		if i > self.size - 1:
 			return -1
-		nodeTodelete = self.retrieveRecNode(i , self.root)
-		if nodeTodelete.left.isRealNode() and nodeTodelete.right.isRealNode(): #node has 2 boys
-			successorNode = self.find_successor(nodeTodelete)
-			nodeTodelete.value = successorNode.value
-			if successorNode.right.isRealNode():
-				if successorNode.parent.right == successorNode:
-					x = successorNode.parent
-					successorNode.parent.setRight(successorNode.right)
-					successorNode.right.setParent(successorNode.parent)
-				else:
-					x = successorNode.parent
-					x.setLeft(successorNode.right)
-					successorNode.right.setParent(x)
-				successorNode.setParent(None)
-				successorNode.setRight(None)
-				self.fixNodesSizeDelete(x)
-				res = self.fixbfDelete(x)
-				self.size -= 1
-				return res
-			else:
-				if successorNode.parent.right == successorNode: #seccessor node is right to deleted node
-					x = successorNode.parent
-					successorNode.parent.setRight(fakeNode)
-					successorNode.setParent(None)
-				else: #seccessor node is left boy
-					x = successorNode.parent
-					successorNode.parent.setLeft(fakeNode)
-					successorNode.setParent(None)
-				self.fixNodesSizeDelete(x)
-				res = self.fixbfDelete(x)
-				self.size -= 1
-				return res
-		elif nodeTodelete.left.isRealNode() and not nodeTodelete.right.isRealNode(): #node has only left boy
-			x = nodeTodelete.parent
-			if x.left == nodeTodelete:
-				nodeTodelete.left.setParent(nodeTodelete.parent)
-				nodeTodelete.parent.setLeft(nodeTodelete.left)
-			elif x.right == nodeTodelete:
-				nodeTodelete.left.setParent(nodeTodelete.parent)
-				nodeTodelete.parent.setRight(nodeTodelete.left)
-			nodeTodelete.setParent(None)
-			nodeTodelete.setLeft(None)
-			self.fixNodesSizeDelete(x)
-			res = self.fixbfDelete(x)
-			self.size -= 1
-			return res
-		elif not nodeTodelete.left.isRealNode() and nodeTodelete.right.isRealNode(): #node has only right boy
-			x = nodeTodelete.parent
-			if x.left == nodeTodelete:
-				nodeTodelete.right.setParent(nodeTodelete.parent)
-				nodeTodelete.parent.setLeft(nodeTodelete.right)
-			elif x.right == nodeTodelete:
-				nodeTodelete.right.setParent(nodeTodelete.parent)
-				nodeTodelete.parent.setRight(nodeTodelete.right)
-			nodeTodelete.setParent(None)
-			nodeTodelete.setRight(None)
-			self.fixNodesSizeDelete(x)
-			res = self.fixbfDelete(x)
-			self.size -= 1
-			return res
-		elif not nodeTodelete.left.isRealNode() and not nodeTodelete.right.isRealNode(): #node is a leaf
-			x = nodeTodelete.parent
-			if nodeTodelete.parent.right == nodeTodelete: #leaf is a right son
-				nodeTodelete.parent.setRight(fakeNode)
-				nodeTodelete.setParent(None)
-			else: #leaf is a left son
-				nodeTodelete.parent.setLeft(fakeNode)
-				nodeTodelete.setParent(None)
-			self.fixNodesSizeDelete(x)
-			res = self.fixbfDelete(x)
-			self.size -= 1
-			return res
 
+		node_to_delete = self.retrieveRecNode(i, self.root)
+		left = node_to_delete.getLeft()
+		right = node_to_delete.getRight()
 
+		if left.isRealNode() and right.isRealNode():  # node has 2 boys
+			return self.deleteWithTwoSons(node_to_delete)
 
+		elif left.isRealNode() and not right.isRealNode():  # node has only left boy
+			num_rebalance = self.deleteWithOneSon(node_to_delete, left)
+			node_to_delete.setLeft(None)
+			return num_rebalance
 
-	def fixbfDelete(self, node):
+		elif not left.isRealNode() and right.isRealNode():  # node has only right boy
+			num_rebalance = self.deleteWithOneSon(node_to_delete, right)
+			node_to_delete.setRight(None)
+			return num_rebalance
+
+		elif not node_to_delete.left.isRealNode() and not node_to_delete.right.isRealNode():  # node is a leaf
+			return self.DeleteLeaf(node_to_delete)
+
+	# todo add documentation
+	def DeleteLeaf(self, node_to_delete):
+		del_parent = node_to_delete.getParent
+		if del_parent.getRight() == node_to_delete:  # leaf is a right son
+			del_parent.setRight(fakeNode)
+		else:  # leaf is a left son
+			del_parent.setLeft(fakeNode)
+		node_to_delete.setParent(None)
+		num_rebalance = self.rebalanceAndCount(del_parent)
+		return num_rebalance
+
+	# todo add documentation
+	def deleteWithTwoSons(self, node_to_delete):
+		successorNode = self.find_successor(node_to_delete)
+		node_to_delete.setValue(successorNode.getValue())
+		succ_right = successorNode.getRight()
+		succ_parent = successorNode.getParent()
+		if succ_right.isRealNode():
+			succ_right.setParent(succ_parent)
+			num_rebalance_op = self.deleteBySuccessor(succ_parent, succ_right, successorNode)
+			successorNode.setRight(None)
+		else:
+			num_rebalance_op = self.deleteBySuccessor(succ_parent, fakeNode, successorNode)
+		return num_rebalance_op
+
+	# todo add documentation
+	def deleteWithOneSon(self, node_to_delete, son):
+		del_parent = node_to_delete.getParent()
+		son.setParent(del_parent)
+		if del_parent.getLeft() == node_to_delete:
+			del_parent.setLeft(son)
+		elif del_parent.right == node_to_delete:
+			del_parent.setRight(son)
+		node_to_delete.setParent(None)
+		num_rebalance = self.rebalanceAndCount(del_parent)
+		return num_rebalance
+
+	# todo add documentation
+	def deleteBySuccessor(self, succ_parent, succ_right, successorNode):
+		if succ_parent.getRight() == successorNode:
+			succ_parent.setRight(succ_right)
+		else:
+			succ_parent.setLeft(succ_right)
+		successorNode.setParent(None)
+		return self.rebalanceAndCount(succ_parent)
+
+	# todo add documentation
+	def rebalanceAndCount(self, succ_parent):
+		self.fixNodesSizeDelete(succ_parent)
+		num_rebalance_op = self.fixbfDelete(succ_parent)
+		self.size -= 1
+		return num_rebalance_op
+
+	def fixbfDelNew(self, node):
 		counter = 0
-		while node != None:
-			node.bf = node.left.getHeight() - node.right.getHeight()
-			if node.getHeight() == max(node.right.getHeight(), node.left.getHeight()) + 1 and abs(node.getbf()) < 2:  # assuming new node (leaf) height = 0, meaning node height didn't change
+		while node is not None:
+			left_height = node.getLeft().getHeight()
+			right_height = node.getRight().getHeight()
+			node.setBF(left_height-right_height)
+
+			new_height = max(right_height, left_height + 1)
+			# assuming new node (leaf) height = 0, meaning node height didn't change
+			if node.getHeight() == new_height and abs(node.getBF()) < 2:
 				break
-			elif abs(node.getbf()) < 2:  # node's height has changed but rotation not needed
-				node.setHeight(max(node.right.getHeight(), node.left.getHeight()) + 1)
+
+			elif abs(node.getBF()) < 2:  # node's height has changed but rotation not needed
+				node.setHeight(new_height)
 				counter += 1
-			elif abs(node.bf) > 1:  # rotaion is needed
+
+			# returning cause one rotation is enough in insert
+			elif abs(node.getBF()) > 1:  # rotation is needed
 				r = self.checkRotationNeededDeletion(node)
 				if r == 1:  # left rotation
-					counter += 1
-					if node == self.root:
-						self.root = self.leftrotation(node)
-						self.root.setParent(None)
-						node = node.parent
-					elif node.parent.left == node:
-						x = node.parent
-						y = self.leftrotation(node)
-						x.left = y
-						y.parent = x
-						node = y.parent
-					else:
-						x = node.parent
-						y = self.leftrotation(node)
-						x.right = y
-						y.parent = x
-						node = y.parent
+					return self.leftRotationDelete(counter, node)
 				elif r == 2:  # rl rotation
-					counter += 2
-					node.right = self.rightrotaion(node.right)
-					if node == self.root:
-						self.root = self.leftrotation(node)
-						self.root.setParent(None)
-						node = node.parent
-					elif node.parent.left == node:
-						x = node.parent
-						x.left = self.leftrotation(node)
-						x.left.parent = x
-						node = x
-					else:
-						x = node.parent
-						x.right = self.leftrotation(node)
-						x.right.parent = x
-						node = x
+					return self.RightLeftRotationDelete(counter, node)
 				elif r == 3:  # right rotation
-					counter += 1
-					if node == self.root:
-						self.root = self.rightrotaion(node)
-						self.root.setParent(None)
-						node = node.parent
-					elif node.parent.left == node:
-						x = node.parent
-						y = self.rightrotaion(node)
-						x.left = y
-						y.parent = x
-						node = y.parent#####
-					else:
-						x = node.parent
-						y = self.rightrotaion(node)
-						x.right = y
-						y.parent = x
-						node = y.parent#####
+					return self.RightRotationDelete(counter, node)
 				elif r == 4:  # lr rotation
-					counter += 2
-					node.left = self.leftrotation(node.left)
-					if node == self.root:
-						self.root = self.rightrotaion(node)
-						node = node.parent ######
-					elif node.parent.right == node:
-						x = node.parent
-						x.right = self.rightrotaion(node)
-						x.right.parent = x
-						node = x
-					else:
-						x = node.parent
-						x.left = self.rightrotaion(node)
-						x.left.parent = x
-						node = x
+					return self.LeftRightRotationDelete(counter, node)
+			node = node.getParent()
+		return counter
+
+	# todo documentation
+	def LeftRightRotationDelete(self, counter, node):
+		counter += 2
+		node.setLeft(self.leftrotation(node.getLeft()))
+		if node == self.root:
+			self.root = self.rightrotaion(node)
+			return counter
+
+		x = node.getParent()
+		new_son = self.rightrotaion(node)
+		new_son.setParent(x)
+		if x.getLeft() == node:
+			x.setLeft(new_son)
+		else:
+			x.setRight(new_son)
+		return counter
+
+	# todo documentation
+	def RightRotationDelete(self, counter, node):
+		counter += 1
+		if node == self.root:
+			self.root = self.rightrotaion(node)
+			self.root.setParent(None)
+			return counter
+
+		x = node.getParent()
+		y = self.rightrotaion(node)
+		y.setParent(x)
+		if x.getLeft() == node:
+			x.setLeft(y)
+		else:
+			x.setRight(y)
+		return counter
+
+	# todo documentation
+	def RightLeftRotationDelete(self, counter, node):
+		counter += 2
+		node.setRight(self.rightrotaion(node.getRight()))
+		if node == self.root:
+			self.root = self.leftrotation(node)
+			self.root.setParent(None)
+			return counter
+
+		x = node.getParent()
+		new_son = self.leftrotation(node)
+		new_son.setParent(x)
+		if x.getLeft() == node:
+			x.setLeft(new_son)
+		else:
+			x.setRight(new_son)
+		return counter
+
+	# todo documentation
+	def leftRotationDelete(self, counter, node):
+		counter += 1
+		if node == self.root:
+			self.root = self.leftrotation(node)
+			self.root.setParent(None)
+			return counter
+		parent = node.getParent()
+		y = self.leftrotation(node)
+		y.setParent(parent)
+		if parent.getLeft() == node:
+			parent.setLeft(y)
+		else:
+			parent.setRight(y)
 		return counter
 
 	def checkRotationNeededDeletion(self, node):
-		if node.right.isRealNode():
-			node.right.bf = node.right.left.getHeight() - node.right.right.getHeight()
-			if node.bf == -2 and (node.right.bf == -1 or node.right.bf == 0):
-				return 1 #left rotation
-			elif node.bf == -2 and node.right.bf == 1:
-				return 2 #right and than left rotation
-		if node.left.isRealNode():
-			node.left.bf = node.left.left.getHeight() - node.left.right.getHeight()
-			if node.bf == 2 and (node.left.bf == 1 or node.left.bf == 0):
-				return 3 #right rotation
-			elif node.bf == 2 and node.left.bf == -1:
-				return 4 #left and than right roataion
+		right = node.getRight()
+		left = node.getLeft()
+		bf = node.getBF
+		if right.isRealNode():
+			right_bf = right.getLeft().getHeight() - right.getRight.getHeight()
+			if bf == -2 and (right_bf == -1 or right_bf == 0):
+				return 1  # left rotation
+			elif bf == -2 and right_bf == 1:
+				return 2  # right and than left rotation
+		if left.isRealNode():
+			left_bf = left.getLeft().getHeight() - left.getRight.getHeight()
+			if bf == 2 and (left_bf == 1 or left_bf == 0):
+				return 3  # right rotation
+			elif bf == 2 and left_bf == -1:
+				return 4  # left and than right roataion
 
-	def fixNodesSizeDelete(self,node):
-		while node != None:
-			node.size -= 1
-			node = node.parent
+	# todo documentation
+	def fixNodesSizeDelete(self, node):
+		while node is not None:
+			node.increaseSizeBy(-1)
+			node = node.getParent()
 		return None
 
-
+	# todo documentation
 	def find_successor(self, node):
-		node = node.right
-		while node.left.isRealNode():
-			node = node.left
+		node = node.getRight()
+		while node.getLeft().isRealNode():
+			node = node.getLeft()
 		return node
-
 
 	"""returns the value of the first item in the list
 
 	@rtype: str
 	@returns: the value of the first item, None if the list is empty
 	"""
+
 	def first(self):
 		if self.empty():
 			return None
 		node = self.root
-		while node.left.isRealNode():
-			node = node.left
-		return node.value
+		while node.getLeft().isRealNode():
+			node = node.getLeft()
+		return node.getValue()
 
 	"""returns the value of the last item in the list
 
 	@rtype: str
 	@returns: the value of the last item, None if the list is empty
 	"""
+
 	def last(self):
 		if self.empty():
 			return None
 		node = self.root
-		while node.right.isRealNode():
-			node = node.right
-		return node.value
+		while node.getRight().isRealNode():
+			node = node.getRight()
+		return node.getValue()
 
 	"""performs an inOrder scan using an action on all nodes by scan order
 	
@@ -622,6 +711,7 @@ class AVLTreeList(object):
 	@rtype: int
 	@returns: the size of the list
 	"""
+
 	def length(self):
 		return self.size
 
@@ -647,6 +737,7 @@ class AVLTreeList(object):
 	@returns: a list [left, val, right], where left is an AVLTreeList representing the list until index i-1,
 	right is an AVLTreeList representing the list from index i+1, and val is the value at the i'th index.
 	"""
+
 	def split(self, i):
 		node = self.retrieveNode(self, i)
 		if node is None or not node.isRealNode():
@@ -678,10 +769,11 @@ class AVLTreeList(object):
 	@rtype: int
 	@returns: the absolute value of the difference between the height of the AVL trees joined
 	"""
+
 	def concat(self, lst):
 		node_to_join = self.last()
 		height_diff = abs(self.root.getHeight() - lst.root.getHeight())
-		self.delete(self.size-1)  # size-1 is the index of last
+		self.delete(self.size - 1)  # size-1 is the index of last
 		self.join(self.root, node_to_join, lst)
 
 		return height_diff
@@ -695,13 +787,14 @@ class AVLTreeList(object):
 	@rtype: AVLTreeList
 	@returns: the joined lst
 	"""
+
 	def join(self, lst1, node, lst2):
 		if lst1 is None or not lst1.root.isRealNode():
 			lst2.insert(0, node.getValue())
 			return lst2
 
 		if lst2 is None or not lst2.root.isRealNode():
-			lst1.insert((lst1.size-1), node.getValue())
+			lst1.insert((lst1.size - 1), node.getValue())
 			return lst1
 
 		left_height = lst1.root.getHeight()
@@ -725,6 +818,7 @@ class AVLTreeList(object):
 	@rtype: AVLTreeList
 	@returns: the joined lst
 	"""
+
 	def joinTallerLeft(self, tall_lst, small_lst, node, small_height):
 		lower_son = tall_lst.findRightSubtreeByHeight(small_height)
 		lower_parent = lower_son.getParent()
@@ -733,7 +827,7 @@ class AVLTreeList(object):
 		node.setParent(lower_parent)
 		lower_parent.setRight(node)
 		# todo make sure balanced
-		#todo update size and height
+		# todo update size and height
 		return tall_lst
 
 	"""joins tall_lst and small_lst with node as the connector node, 
@@ -747,6 +841,7 @@ class AVLTreeList(object):
 	@rtype: AVLTreeList
 	@returns: the joined lst
 	"""
+
 	def joinTallerRight(self, tall_lst, small_lst, node, small_height):
 		lower_son = tall_lst.findLeftSubtreeByHeight(small_height)
 		lower_parent = lower_son.getParent()
@@ -755,7 +850,7 @@ class AVLTreeList(object):
 		node.setParent(lower_parent)
 		lower_parent.setLeft(node)
 		# todo make sure balanced
-		#todo update size and height
+		# todo update size and height
 		return tall_lst
 
 	"""searches for the first (in order) node that contains value
@@ -786,18 +881,19 @@ class AVLTreeList(object):
 	@rtype: int
 	@returns: the first index that contains val, -1 if not found.
 	"""
+
 	def search(self, val):
 		found, found_index = self.inOrderSearch(self.root, val)
 		if found is None:
 			return -1
 		return found_index
 
-
 	"""returns the root of the tree representing the list
 
 	@rtype: AVLNode
 	@returns: the root, None if the list is empty
 	"""
+
 	def getRoot(self):
 		if self.size == 0:
 			return None
