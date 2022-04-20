@@ -218,17 +218,9 @@ class AVLTreeList(object):
 	def retrieve(self, i):
 		if i > self.size - 1 or i < 0:
 			return None
-		return self.retrieveRec(i, self.root)
+		node = self.retrieveRec(i, self.root)
+		return node.getValue()
 
-	# todo add documentation above func
-	def retrieveRec(self, i, node):
-		left_size = node.getLeft().getSize()
-		if left_size == i:
-			return node.getValue()
-		elif left_size < i:
-			return self.retrieveRec(i - left_size - 1, node.getRight())
-		else:
-			return self.retrieveRec(i, node.getLeft())
 
 	"""inserts val at position i in the list
 
@@ -255,7 +247,7 @@ class AVLTreeList(object):
 			node.setRight(new_node)
 			return self.setParentAndRebalance(new_node, node)
 		else:
-			optional_parent_node = self.retrieveRecNode(i, self.root)
+			optional_parent_node = self.retrieveNode(i)
 			if not optional_parent_node.getLeft().isRealNode():
 				optional_parent_node.setLeft(new_node)
 				return self.setParentAndRebalance(new_node, optional_parent_node)
@@ -411,20 +403,6 @@ class AVLTreeList(object):
 		z.setSize(new_z_right.getSize() + z.getLeft().getSize() + 1)
 		return y
 
-	'''
-		todo change to
-		result = retrieveRec(i, node)
-		return result.getValue()
-		'''
-	# todo documentation
-	def retrieveRecNode(self, i, node):
-		left_size = node.getLeft().getSize()
-		if left_size == i:
-			return node
-		elif left_size < i:
-			return self.retrieveRecNode(i - left_size - 1, node.getRight())
-		return self.retrieveRecNode(i, node.getLeft())  # happens when left_size>i
-
 	# todo documentation
 	def find_predecessor(self, node):
 		node = node.getLeft()
@@ -445,7 +423,7 @@ class AVLTreeList(object):
 		if i > self.size - 1:
 			return -1
 
-		node_to_delete = self.retrieveRecNode(i, self.root)
+		node_to_delete = self.retrieveNode(i)
 		left = node_to_delete.getLeft()
 		right = node_to_delete.getRight()
 
@@ -717,16 +695,36 @@ class AVLTreeList(object):
 
 	"""retrieves the node of the i'th item in the list
 
-		@type i: int
-		@pre: 0 <= i < self.length()
-		@param i: index in the list
-		@rtype: AVLNode
-		@returns: the node of the i'th item in the list
-		"""
+	@type i: int
+	@pre: 0 <= i < self.length()
+	@param i: index in the list
+	@rtype: AVLNode
+	@returns: the node of the i'th item in the list
+	"""
 
 	def retrieveNode(self, i):
-		# todo modify retrieve to use this and extract value
-		return fakeNode
+		if self.empty():
+			return None
+		return self.retrieveRec(i, self.root)
+
+	"""retrieves the node of the i'th item in the list
+
+	@type i: int
+	@pre: 0 <= i < self.length()
+	@param i: index in the list
+	@type node: AVLNode
+	@param node: node current "root" of tree in recursion
+	@rtype: AVLNode
+	@returns: the node of the i'th item in the list
+	"""
+	def retrieveRec(self, i, node):
+		left_size = node.getLeft().getSize()
+		if left_size == i:
+			return node
+		elif left_size < i:
+			return self.retrieveRec(i - left_size - 1, node.getRight())
+		else:
+			return self.retrieveRec(i, node.getLeft())
 
 	"""splits the list at the i'th index
 
