@@ -717,8 +717,12 @@ class AVLTreeList(object):
 		self_height, lst_height = 0, 0
 		if self.root is not None:
 			self_height = self.root.getHeight()
+		else:
+			self_height = -1
 		if lst.root is not None:
 			lst_height = lst.root.getHeight()
+		else:
+			lst_height = -1
 		height_diff = abs(self_height - lst_height)
 		self.delete(self.size - 1)  # size-1 is the index of last
 		joined = self.join(self, node_to_join, lst)
@@ -738,12 +742,17 @@ class AVLTreeList(object):
 	"""
 
 	def join(self, lst1, node, lst2):
+		if (lst1 is None or lst1.empty()) and (lst2 is None or lst2.empty()):
+			return lst1
+
 		if lst1 is None or lst1.root is None or not lst1.root.isRealNode():
-			lst2.insert(0, node.getValue())
+			if node is not None and node.isRealNode():
+				lst2.insert(0, node.getValue())
 			return lst2
 
 		if lst2 is None or lst2.root is None or not lst2.root.isRealNode():
-			lst1.insert((lst1.size - 1), node.getValue())
+			if node is not None and node.isRealNode():
+				lst1.insert((lst1.size - 1), node.getValue())
 			return lst1
 
 		left_height = lst1.root.getHeight()
