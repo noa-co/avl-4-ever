@@ -261,22 +261,12 @@ class AVLTreeList(object):
 	def setParentAndRebalance(self, new_node, optional_parent_node):
 		new_node.setParent(optional_parent_node)
 		num_rebalance_op = self.fixbf(optional_parent_node)
-		''' eyal hayakar, i had a problem in this case of insertion and my solution isnt working.
-		The problem was that there were cases in which after fixing the tree in fixbf the parent of the
-		inserted node was no longer optimal_parent_node and then we increased the size of optimal parent but 
-		that was a mistake and made it have +1 to the actual value.
-		so i tried setting it to the real parent but that creates bugs as well.
-		Ive decided to leave this problem to you - the insertion master.
-		Good luck!
-		'''
-		if new_node.getParent() != optional_parent_node:
-			optional_parent_node = new_node.getParent()
-		self.fixNodesSize(optional_parent_node, 1)
+		self.insertfixNodesSize(optional_parent_node)
 		return num_rebalance_op
 
 	def fixbf(self, node, stopAfterRotate=True, forDelete=False):
 		counter = 0
-		while node is not None:
+		while node is not None and node.isRealNode():
 			left_height = node.getLeft().getHeight()
 			right_height = node.getRight().getHeight()
 			node.setBF(left_height - right_height)
@@ -441,7 +431,7 @@ class AVLTreeList(object):
 	"""
 
 	def delete(self, i):
-		if i > self.size - 1:
+		if i < 0 or i > self.size - 1:
 			return -1
 
 		node_to_delete = self.retrieveNode(i)
@@ -529,6 +519,18 @@ class AVLTreeList(object):
 	def fixNodesSize(self, node, incrementBy):
 		while node is not None:
 			node.increaseSizeBy(incrementBy)
+			node = node.getParent()
+
+	def insertfixNodesSize(self, node):
+		while node is not None:
+			left = node.getLeft()
+			right = node.getRight()
+			new_size = 1
+			if left is not None:
+				new_size += left.getSize()
+			if right is not None:
+				new_size += right.getSize()
+			node.setSize(new_size)
 			node = node.getParent()
 
 	# todo documentation
