@@ -339,7 +339,7 @@ class AVLTreeList(object):
 	def checkRotationNeeded(self, node, forDelete=False):
 		right = node.getRight()
 		left = node.getLeft()
-		bf = node.getBF()
+		bf = self.calcBF(node)
 		if right.isRealNode():
 			right_bf = self.calcBF(right)
 			if bf == -2 and (right_bf == -1 or (forDelete and right_bf == 0)):
@@ -399,9 +399,6 @@ class AVLTreeList(object):
 		x = node.getParent()
 		y = self.rotateRight(node)
 		y.setParent(x)
-		# todo i think delete this after finding real problem
-		if x is None:
-			return counter
 		if x.getLeft() == node:
 			x.setLeft(y)
 		else:
@@ -680,26 +677,22 @@ class AVLTreeList(object):
 			node.setHeight(new_h)
 			node = node.getParent()
 
-	""" fixes node size and height by children data after insert
+	""" fixes node size by children data after insert
 
 	@type node: AVLNode
-	@param node: node to start updating height and size upwards from
+	@param node: node to start updating size upwards from
 	"""
 	def insertfixNodesSize(self, node):
 		while node is not None:
 			left = node.getLeft()
 			right = node.getRight()
 			new_size = 1
-			left_height, right_height = -1, -1
 			if left is not None:
 				new_size += left.getSize()
-				left_height = left.getHeight()
 			if right is not None:
 				new_size += right.getSize()
-				right_height = right.getHeight()
 			node.setSize(new_size)
-			new_h = max(right_height, left_height) + 1
-			node.setHeight(new_h)
+
 			node = node.getParent()
 
 	""" finds successor of node
@@ -1026,25 +1019,21 @@ class AVLTreeList(object):
 		tall_lst.fixNodeFieldsJoin(node)
 		return tall_lst
 
-	""" fixes node size and height by children data after join
+	""" fixes node size by children data after join
 
 	@type node: AVLNode
-	@param node: node to start updating height and size upwards from
+	@param node: node to start updating size upwards from
 	"""
 	def fixNodeFieldsJoin(self, node):
 		while node is not None and node.isRealNode():
 			left = node.getLeft()
 			right = node.getRight()
-			left_height, right_height = 0, 0
 			new_size = 0
 			if left is not None and left.isRealNode():
-				left_height = left.getHeight()
 				new_size += left.getSize()
 			if right is not None and right.isRealNode():
-				right_height = right.getHeight()
 				new_size += right.getSize()
-			new_height = max(left_height, right_height) + 1
-			node.setHeight(new_height)
+
 			node.setSize(new_size + 1)
 			node = node.getParent()
 		return
