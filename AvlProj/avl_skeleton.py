@@ -654,6 +654,7 @@ class AVLTreeList(object):
 	@param incrementBy: number to increment sizes by
 	
 	"""
+
 	def fixNodesSize(self, node, incrementBy):
 		while node is not None:
 			node.increaseSizeBy(incrementBy)
@@ -664,6 +665,7 @@ class AVLTreeList(object):
 	@type node: AVLNode
 	@param node: node to start updating height upwards from
 	"""
+
 	def fixNodesHeight(self, node):
 		while node is not None:
 			left = node.getLeft()
@@ -682,18 +684,20 @@ class AVLTreeList(object):
 	@type node: AVLNode
 	@param node: node to start updating size upwards from
 	"""
+
 	def insertfixNodesSize(self, node):
-		while node is not None:
+		while node is not None and node.isRealNode():
 			left = node.getLeft()
 			right = node.getRight()
 			new_size = 1
-			if left is not None:
+			if left is not None and left.isRealNode():
 				new_size += left.getSize()
-			if right is not None:
+			if right is not None and right.isRealNode():
 				new_size += right.getSize()
-			node.setSize(new_size)
 
+			node.setSize(new_size)
 			node = node.getParent()
+		return
 
 	""" finds successor of node
 
@@ -969,7 +973,7 @@ class AVLTreeList(object):
 		if lower_parent is not None:
 			lower_parent.setRight(node)
 		tall_lst.fixbf(node, False, True)
-		tall_lst.fixNodeFieldsJoin(node)
+		tall_lst.insertfixNodesSize(node)
 		return tall_lst
 
 	"""finds and returns root of the first subtree of tree list from the side
@@ -986,7 +990,7 @@ class AVLTreeList(object):
 
 	def findSideSubtreeByHeight(self, height, getSide):
 		node = self.root
-		while node is not None and node.isRealNode()\
+		while node is not None and node.isRealNode() \
 				and node.getHeight() > height and getSide(node).isRealNode():
 			node = getSide(node)
 		return node
@@ -1016,27 +1020,8 @@ class AVLTreeList(object):
 		else:
 			tall_lst.root = node
 		tall_lst.fixbf(node, False, True)
-		tall_lst.fixNodeFieldsJoin(node)
+		tall_lst.insertfixNodesSize(node)
 		return tall_lst
-
-	""" fixes node size by children data after join
-
-	@type node: AVLNode
-	@param node: node to start updating size upwards from
-	"""
-	def fixNodeFieldsJoin(self, node):
-		while node is not None and node.isRealNode():
-			left = node.getLeft()
-			right = node.getRight()
-			new_size = 0
-			if left is not None and left.isRealNode():
-				new_size += left.getSize()
-			if right is not None and right.isRealNode():
-				new_size += right.getSize()
-
-			node.setSize(new_size + 1)
-			node = node.getParent()
-		return
 
 	"""searches for the first (in order) node that contains value
 
