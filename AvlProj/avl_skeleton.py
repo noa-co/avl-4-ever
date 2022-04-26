@@ -344,7 +344,7 @@ class AVLTreeList(object):
 	def checkRotationNeeded(self, node, forDelete=False):
 		right = node.getRight()
 		left = node.getLeft()
-		bf = node.getBF()
+		bf = self.calcBF(node)
 		if right.isRealNode():
 			right_bf = self.calcBF(right)
 			if bf == -2 and (right_bf == -1 or (forDelete and right_bf == 0)):
@@ -404,8 +404,6 @@ class AVLTreeList(object):
 		x = node.getParent()
 		y = self.rotateRight(node)
 		y.setParent(x)
-		if x is None:
-			return counter
 		if x.getLeft() == node:
 			x.setLeft(y)
 		else:
@@ -661,6 +659,7 @@ class AVLTreeList(object):
 	@param incrementBy: number to increment sizes by
 	
 	"""
+
 	def fixNodesSize(self, node, incrementBy):
 		while node is not None:
 			node.increaseSizeBy(incrementBy)
@@ -671,6 +670,7 @@ class AVLTreeList(object):
 	@type node: AVLNode
 	@param node: node to start updating height upwards from
 	"""
+
 	def fixNodesHeight(self, node):
 		while node is not None:
 			left = node.getLeft()
@@ -684,27 +684,25 @@ class AVLTreeList(object):
 			node.setHeight(new_h)
 			node = node.getParent()
 
-	""" fixes node size and height by children data after insert
+	""" fixes node size by children data after insert
 
 	@type node: AVLNode
-	@param node: node to start updating height and size upwards from
+	@param node: node to start updating size upwards from
 	"""
+
 	def insertfixNodesSize(self, node):
-		while node is not None:
+		while node is not None and node.isRealNode():
 			left = node.getLeft()
 			right = node.getRight()
 			new_size = 1
-			left_height, right_height = -1, -1
-			if left is not None:
+			if left is not None and left.isRealNode():
 				new_size += left.getSize()
-				left_height = left.getHeight()
-			if right is not None:
+			if right is not None and right.isRealNode():
 				new_size += right.getSize()
-				right_height = right.getHeight()
+
 			node.setSize(new_size)
-			new_h = max(right_height, left_height) + 1
-			node.setHeight(new_h)
 			node = node.getParent()
+		return
 
 	""" finds successor of node
 
@@ -877,7 +875,14 @@ class AVLTreeList(object):
 
 		return [left_subtree, val, right_subtree]
 
-	# todo
+	"""creates and returns a new tree list object from data
+
+	@type root: AVLNode
+	@param root: the root of new tree
+	@rtype: AVLTreeList
+	@returns: a new avl tree list from the data given
+	"""
+
 	def createTreeListFromRoot(self, root):
 		new_tree = AVLTreeList()
 		if root is not None and root.isRealNode():
@@ -963,9 +968,8 @@ class AVLTreeList(object):
 	"""
 
 	def joinTallerLeft(self, tall_lst, small_lst, node, small_height):
-		otherSide = lambda n: n.getLeft()
 		getRight = lambda n: n.getRight()
-		lower_son = tall_lst.findSideSubtreeByHeight(small_height, getRight, otherSide)
+		lower_son = tall_lst.findSideSubtreeByHeight(small_height, getRight)
 		lower_parent = lower_son.getParent()
 		node.setLeft(lower_son)
 		lower_son.setParent(node)
@@ -974,13 +978,24 @@ class AVLTreeList(object):
 		if lower_parent is not None:
 			lower_parent.setRight(node)
 		tall_lst.fixbf(node, False, True)
-		tall_lst.fixNodeFieldsJoin(node)
+		tall_lst.insertfixNodesSize(node)
 		return tall_lst
 
-	#todo
-	def findSideSubtreeByHeight(self, height, getSide, otherSide):
+	"""finds and returns root of the first subtree of tree list from the side
+	given as a parameter that has the height given. 
+	In case theres no subtree matching, finds subtree of closest height that exists
+
+	@type height: int
+	@param height: height needed for returned subtree
+	@type getSide: function
+	@param getSide: a function that returns left son or right son of node
+	@rtype: AVLNode
+	@returns: the matching root of subtree in need (detailed above)
+	"""
+
+	def findSideSubtreeByHeight(self, height, getSide):
 		node = self.root
-		while node is not None and node.isRealNode()\
+		while node is not None and node.isRealNode() \
 				and node.getHeight() > height and getSide(node).isRealNode():
 			node = getSide(node)
 		return node
@@ -998,9 +1013,8 @@ class AVLTreeList(object):
 	"""
 
 	def joinTallerRight(self, tall_lst, small_lst, node, small_height):
-		otherSide = lambda n: n.getRight()
 		getLeft = lambda n: n.getLeft()
-		lower_son = tall_lst.findSideSubtreeByHeight(small_height, getLeft, otherSide)
+		lower_son = tall_lst.findSideSubtreeByHeight(small_height, getLeft)
 		lower_parent = lower_son.getParent()
 		node.setLeft(small_lst.root)
 		node.setRight(lower_son)
@@ -1011,27 +1025,8 @@ class AVLTreeList(object):
 		else:
 			tall_lst.root = node
 		tall_lst.fixbf(node, False, True)
-		tall_lst.fixNodeFieldsJoin(node)
+		tall_lst.insertfixNodesSize(node)
 		return tall_lst
-
-	#todo
-	def fixNodeFieldsJoin(self, node):
-		while node is not None and node.isRealNode():
-			left = node.getLeft()
-			right = node.getRight()
-			left_height, right_height = 0, 0
-			new_size = 0
-			if left is not None and left.isRealNode():
-				left_height = left.getHeight()
-				new_size += left.getSize()
-			if right is not None and right.isRealNode():
-				right_height = right.getHeight()
-				new_size += right.getSize()
-			new_height = max(left_height, right_height) + 1
-			node.setHeight(new_height)
-			node.setSize(new_size + 1)
-			node = node.getParent()
-		return
 
 	"""searches for the first (in order) node that contains value
 
