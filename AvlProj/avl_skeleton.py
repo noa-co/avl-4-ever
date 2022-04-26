@@ -294,6 +294,7 @@ class AVLTreeList(object):
 			elif abs(node.getBF()) < 2:  # node's height has changed but rotation not needed
 				node.setHeight(new_height)
 				counter += 1
+				node = node.getParent()
 
 			# returning cause one rotation is enough in insert
 			else:  # rotation is needed
@@ -301,15 +302,19 @@ class AVLTreeList(object):
 				r = self.checkRotationNeeded(node, forDelete)
 				if r == 1:  # left rotation
 					counter = self.leftRotation(counter, node)
+					node = node.getParent().getParent()
 				elif r == 2:  # rl rotation
 					counter = self.rightLeftRotation(counter, node)
+					node = node.getParent().getParent()
 				elif r == 3:  # right rotation
 					counter = self.rightRotation(counter, node)
+					node = node.getParent().getParent()
 				elif r == 4:  # lr rotation
 					counter = self.leftRightRotation(counter, node)
+					node = node.getParent().getParent()
 				if stopAfterRotate:
 					return counter
-			node = node.getParent()
+			#node = node.getParent()
 		return counter
 
 	""" calculates balance factor of node by height of children
