@@ -647,7 +647,6 @@ class AVLTreeList(object):
 	def rebalanceAndCount(self, succ_parent):
 		self.fixNodesSize(succ_parent, -1)
 		num_rebalance_op = self.fixbf(succ_parent, False, True)
-		self.fixNodesHeight(succ_parent)
 		self.size -= 1
 		return num_rebalance_op
 
@@ -663,25 +662,6 @@ class AVLTreeList(object):
 	def fixNodesSize(self, node, incrementBy):
 		while node is not None:
 			node.increaseSizeBy(incrementBy)
-			node = node.getParent()
-
-	""" fixes node height by children data
-
-	@type node: AVLNode
-	@param node: node to start updating height upwards from
-	"""
-
-	def fixNodesHeight(self, node):
-		while node is not None:
-			left = node.getLeft()
-			right = node.getRight()
-			left_height, right_height = -1, -1
-			if left is not None:
-				left_height = left.getHeight()
-			if right is not None:
-				right_height = right.getHeight()
-			new_h = max(right_height, left_height) + 1
-			node.setHeight(new_h)
 			node = node.getParent()
 
 	""" fixes node size by children data after insert
@@ -973,10 +953,14 @@ class AVLTreeList(object):
 		lower_parent = lower_son.getParent()
 		node.setLeft(lower_son)
 		lower_son.setParent(node)
-		node.setRight(small_lst.root)
+		new_right = small_lst.root
+		node.setRight(new_right)
+		new_right.setParent(node)
 		node.setParent(lower_parent)
 		if lower_parent is not None:
 			lower_parent.setRight(node)
+		else:
+			tall_lst.root = node
 		tall_lst.fixbf(node, False, True)
 		tall_lst.insertfixNodesSize(node)
 		return tall_lst
@@ -1016,7 +1000,9 @@ class AVLTreeList(object):
 		getLeft = lambda n: n.getLeft()
 		lower_son = tall_lst.findSideSubtreeByHeight(small_height, getLeft)
 		lower_parent = lower_son.getParent()
-		node.setLeft(small_lst.root)
+		new_left = small_lst.root
+		node.setLeft(new_left)
+		new_left.setParent(node)
 		node.setRight(lower_son)
 		lower_son.setParent(node)
 		node.setParent(lower_parent)
